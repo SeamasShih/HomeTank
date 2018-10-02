@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:splitMotionEvents="false"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.honhai.foxconn.hometank.views.UpKey
+        android:id="@+id/upKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@+id/rightKey"
+        app:layout_constraintEnd_toStartOf="@+id/rightKey" />
+
+    <com.honhai.foxconn.hometank.views.DownKey
+        android:id="@+id/downKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/leftKey"
+        app:layout_constraintTop_toBottomOf="@id/leftKey" />
+
+    <com.honhai.foxconn.hometank.views.TurnRightKey
+        android:id="@+id/leftKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/upKey"
+        app:layout_constraintTop_toBottomOf="@id/upKey" />
+
+    <com.honhai.foxconn.hometank.views.TurnLeftKey
+        android:id="@+id/rightKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@id/downKey"
+        app:layout_constraintStart_toEndOf="@id/downKey" />
+
+</android.support.constraint.ConstraintLayout>

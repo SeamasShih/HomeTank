@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:splitMotionEvents="false"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.honhai.foxconn.hometank.views.RaiseKey
+        android:id="@+id/raiseKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@+id/turnRightKey"
+        app:layout_constraintEnd_toStartOf="@+id/turnRightKey" />
+
+    <com.honhai.foxconn.hometank.views.RaiseKey
+        android:id="@+id/lowerKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        android:rotationX="180"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/turnLeftKey"
+        app:layout_constraintTop_toBottomOf="@id/turnLeftKey" />
+
+    <com.honhai.foxconn.hometank.views.TurnLeftKey
+        android:id="@+id/turnLeftKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        android:rotationY="180"
+        app:layout_constraintEnd_toStartOf="@+id/raiseKey"
+        app:layout_constraintTop_toBottomOf="@id/raiseKey" />
+
+    <com.honhai.foxconn.hometank.views.TurnLeftKey
+        android:id="@+id/turnRightKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/lowerKey"
+        app:layout_constraintStart_toEndOf="@id/lowerKey" />
+
+    <com.honhai.foxconn.hometank.views.FireKey
+        android:id="@+id/fireKey"
+        android:layout_width="@dimen/length"
+        android:layout_height="@dimen/length"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@id/raiseKey"
+        app:layout_constraintBottom_toTopOf="@id/lowerKey"
+        app:layout_constraintStart_toEndOf="@id/turnLeftKey"
+        app:layout_constraintEnd_toStartOf="@id/turnRightKey"/>
+
+</android.support.constraint.ConstraintLayout>
