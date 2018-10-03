@@ -2,5 +2,9 @@
 <resources>
 
     <dimen name="length">50dp</dimen>
+    <dimen name="amountWidth">150dp</dimen>
+    <dimen name="amountHeight">50dp</dimen>
+    <dimen name="lifeWidth">150dp</dimen>
+    <dimen name="lifeHeight">30dp</dimen>
 
 </resources>

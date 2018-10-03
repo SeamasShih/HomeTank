@@ -20,6 +20,8 @@ import com.honhai.foxconn.hometank.network.UdpReceiveListener;
 import com.honhai.foxconn.hometank.network.UdpSerCliConstant;
 import com.honhai.foxconn.hometank.network.UdpTankClient;
 import com.honhai.foxconn.hometank.views.keys.FireKey;
+import com.honhai.foxconn.hometank.views.plate.BulletAmountView;
+import com.honhai.foxconn.hometank.views.plate.LifeBarView;
 
 import java.util.StringTokenizer;
 
@@ -27,7 +29,8 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private final String TAG = "GameActivity";
     private GameData gameData = GameData.getInstance();
     private View up, down, left, right, raise, lower, gunLeft, gunRight;
-    private TextView textView;
+    private LifeBarView lifeBarView;
+    private BulletAmountView bulletAmountView;
     private FireKey fire;
     private boolean goUp = false;
     private boolean goDown = false;
@@ -52,7 +55,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         gameData.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.boom));
         setAnimation();
         setClientInfo();
-        textView.setText(String.valueOf(bulletAmount));
     }
 
     private void setAnimation() {
@@ -68,14 +70,14 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         bulletAdd.setDuration(gameData.getMySpeed() * 400);
         bulletAdd.addUpdateListener(animation -> {
             float value = (float) animation.getAnimatedValue();
-            fire.setAddTime(value);
+            bulletAmountView.setAddTime(value);
         });
         bulletAdd.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 bulletAmount++;
-                textView.setText(String.valueOf(bulletAmount));
+                bulletAmountView.setAmount(bulletAmount);
                 if (bulletAmount < 4)
                     bulletAdd.start();
             }
@@ -101,7 +103,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             if (bulletAmount > 0 && !bulletCD.isRunning()) {
                 gameData.addBullet(gameData.getMySelf());
                 bulletAmount--;
-                textView.setText(String.valueOf(bulletAmount));
+                bulletAmountView.setAmount(bulletAmount);
                 bulletCD.start();
                 if (!bulletAdd.isRunning())
                     bulletAdd.start();
@@ -319,7 +321,8 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         gunLeft = findViewById(R.id.turnLeftKey);
         gunRight = findViewById(R.id.turnRightKey);
         fire = findViewById(R.id.fireKey);
-        textView = findViewById(R.id.amount);
+        bulletAmountView = findViewById(R.id.bulletAmount);
+        lifeBarView = findViewById(R.id.lifeBar);
     }
 
     @Override
