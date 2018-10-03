@@ -15,12 +15,19 @@ import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
 import com.honhai.foxconn.hometank.gameplay.GameData;
+import com.honhai.foxconn.hometank.network.TcpReceiveListener;
+import com.honhai.foxconn.hometank.network.TcpTankClient;
+import com.honhai.foxconn.hometank.network.UdpReceiveListener;
+import com.honhai.foxconn.hometank.network.UdpSerCliConstant;
+import com.honhai.foxconn.hometank.network.UdpTankClient;
 import com.honhai.foxconn.hometank.views.keys.FireKey;
 
-public class GameActivity extends AppCompatActivity {
+import java.util.StringTokenizer;
 
+public class GameActivity extends AppCompatActivity implements UdpReceiveListener, TcpReceiveListener {
+    private final String TAG = "GameActivity";
     private GameData gameData = GameData.getInstance();
-    private View up,down, left, right , raise , lower  , gunLeft , gunRight;
+    private View up, down, left, right, raise, lower, gunLeft, gunRight;
     private TextView textView;
     private FireKey fire;
     private boolean goUp = false;
@@ -32,31 +39,34 @@ public class GameActivity extends AppCompatActivity {
     private int bulletAmount = 4;
     private ValueAnimator bulletCD;
     private ValueAnimator bulletAdd;
+    private UdpTankClient udpTankClient = UdpTankClient.getClient(this);
+    private TcpTankClient tcpTankClient = TcpTankClient.getClient(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_layout);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         findViews();
         setListener();
-        gameData.setBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.boom));
+        gameData.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.boom));
         setAnimation();
+        setClientInfo();
         textView.setText(String.valueOf(bulletAmount));
     }
 
     private void setAnimation() {
-        bulletCD = ValueAnimator.ofFloat(0,100);
+        bulletCD = ValueAnimator.ofFloat(0, 100);
         bulletCD.setInterpolator(new LinearInterpolator());
-        bulletCD.setDuration(gameData.getMySpeed()*150);
+        bulletCD.setDuration(gameData.getMySpeed() * 150);
         bulletCD.addUpdateListener(animation -> {
             float value = (float) animation.getAnimatedValue();
             fire.setCD(value);
         });
-        bulletAdd = ValueAnimator.ofFloat(0,100);
+        bulletAdd = ValueAnimator.ofFloat(0, 100);
         bulletAdd.setInterpolator(new LinearInterpolator());
-        bulletAdd.setDuration(gameData.getMySpeed()*400);
+        bulletAdd.setDuration(gameData.getMySpeed() * 400);
         bulletAdd.addUpdateListener(animation -> {
             float value = (float) animation.getAnimatedValue();
             fire.setAddTime(value);
@@ -73,6 +83,9 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
+    private void setClientInfo() {
+        udpTankClient.sendMessage(UdpSerCliConstant.C_INITIAL_TANK_DATA);
+    }
 
     private void setListener() {
         setUpListener();
@@ -98,15 +111,15 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setGunLeftListener() {
-        gunLeft.setOnTouchListener((v, event) ->{
-            switch (event.getActionMasked()){
+        gunLeft.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     goGunLeft = true;
                     new Thread(() -> {
                         while (goGunLeft) {
                             try {
                                 gameData.gunLeft();
-                                Thread.sleep(gameData.getMySpeed()*2);
+                                Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -124,15 +137,15 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setGunRightListener() {
-        gunRight.setOnTouchListener((v, event) ->{
-            switch (event.getActionMasked()){
+        gunRight.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     goGunRight = true;
                     new Thread(() -> {
                         while (goGunRight) {
                             try {
                                 gameData.gunRight();
-                                Thread.sleep(gameData.getMySpeed()*2);
+                                Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -150,8 +163,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setLeftListener() {
-        left.setOnTouchListener((v, event) ->{
-            switch (event.getActionMasked()){
+        left.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     goRight = true;
                     new Thread(() -> {
@@ -160,12 +173,11 @@ public class GameActivity extends AppCompatActivity {
                                 gameData.littleStepBackRotationMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleBackStepRotationMySite();
-                                }
-                                else {
+                                } else {
                                     gameData.littleStepRotationMyBox();
                                     goRight = false;
                                 }
-                                Thread.sleep(gameData.getMySpeed()*2);
+                                Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -183,8 +195,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setRightListener() {
-        right.setOnTouchListener((v, event) ->{
-            switch (event.getActionMasked()){
+        right.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     goLeft = true;
                     new Thread(() -> {
@@ -193,12 +205,11 @@ public class GameActivity extends AppCompatActivity {
                                 gameData.littleStepRotationMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepRotationMySite();
-                                }
-                                else {
+                                } else {
                                     gameData.littleStepBackRotationMyBox();
                                     goLeft = false;
                                 }
-                                Thread.sleep(gameData.getMySpeed()*2);
+                                Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -216,8 +227,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setDownListener() {
-        down.setOnTouchListener((v,event) ->{
-            switch (event.getActionMasked()){
+        down.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     goDown = true;
                     new Thread(() -> {
@@ -226,8 +237,7 @@ public class GameActivity extends AppCompatActivity {
                                 gameData.littleStepBackMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepBackMySite();
-                                }
-                                else {
+                                } else {
                                     gameData.littleStepMyBox();
                                     goUp = false;
                                 }
@@ -249,8 +259,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setUpListener() {
-        up.setOnTouchListener((v,event) ->{
-            switch (event.getActionMasked()){
+        up.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     goUp = true;
                     new Thread(() -> {
@@ -259,8 +269,11 @@ public class GameActivity extends AppCompatActivity {
                                 gameData.littleStepMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepMySite();
-                                }
-                                else {
+                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_SITE
+                                                    + gameData.getMyOrder()
+                                                    + " " + gameData.getX()
+                                                    + " " + gameData.getY());
+                                } else {
                                     gameData.littleStepBackMyBox();
                                     goUp = false;
                                 }
@@ -292,5 +305,32 @@ public class GameActivity extends AppCompatActivity {
         gunRight = findViewById(R.id.turnRightKey);
         fire = findViewById(R.id.fireKey);
         textView = findViewById(R.id.amount);
+    }
+
+    @Override
+    public void onTcpMessageReceive(String message) {
+
+    }
+
+    @Override
+    public void onUdpMessageReceive(String message) {
+        if (message.startsWith(UdpSerCliConstant.C_INITIAL_TANK_DATA)) {
+            for (int i = 0; i < gameData.getPlayerAmount(); i++) {
+                int tank = Character.getNumericValue(message.charAt(UdpSerCliConstant.C_INITIAL_TANK_DATA.length() + i));
+                gameData.setPlayerTankType(tank);
+            }
+        } else if (message.startsWith(UdpSerCliConstant.C_TANK_SITE)) {
+            StringTokenizer tokenizer = new StringTokenizer(message, " ");
+
+            int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_SITE.length()));
+            float x = Float.valueOf(tokenizer.nextToken());
+            float y = Float.valueOf(tokenizer.nextToken());
+            gameData.setPlayersSite(order, x, y);
+            Log.d(TAG, "onUdpMessageReceive: order : " + order + ", x : " + x + ", y : " + y);
+        } else if (message.startsWith(UdpSerCliConstant.C_TANK_GUN_ROTATION)) {
+            Log.d(TAG, "onUdpMessageReceive: rotation : " + message);
+
+            int order = Character.getNumericValue(message.charAt(UdpSerCliConstant.C_TANK_GUN_ROTATION.length()));
+        }
     }
 }

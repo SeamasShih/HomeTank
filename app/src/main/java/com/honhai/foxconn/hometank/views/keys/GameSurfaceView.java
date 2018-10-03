@@ -19,6 +19,7 @@ import com.honhai.foxconn.hometank.gameplay.GameData;
 
 public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callback , Runnable {
 
+    private final String TAG = "GameSurfaceView";
     private SurfaceHolder mSurfaceHolder;
     private Canvas mCanvas;
     private boolean mIsDrawing;
@@ -80,7 +81,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             mCanvas.drawColor(Color.WHITE);
 
             gameData.drawMap(mCanvas);
-            gameData.drawMyself(mCanvas);
+            gameData.drawTank(mCanvas);
             gameData.drawBullet(mCanvas);
             gameData.drawBoom(mCanvas);
 
@@ -93,5 +94,4 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             }
         }
     }
-
 }

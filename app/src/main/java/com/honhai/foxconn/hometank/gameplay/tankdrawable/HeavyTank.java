@@ -37,6 +37,7 @@ public class HeavyTank extends TankPrototype {
         path.addRect(-l,-50,l,0, Path.Direction.CCW);
 
         canvas.translate(50,50);
+        canvas.rotate(90);
         canvas.drawPath(path,paint);
         GunPicture.endRecording();
     }
@@ -61,6 +62,7 @@ public class HeavyTank extends TankPrototype {
         path.close();
 
         canvas.translate(50,50);
+        canvas.rotate(90);
         canvas.drawPath(path,paint);
         BasePicture.endRecording();
     }

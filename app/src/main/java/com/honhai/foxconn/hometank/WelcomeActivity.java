@@ -24,7 +24,6 @@ public class WelcomeActivity extends AppCompatActivity {
             Intent intent = new Intent();
             intent.setClass(this,PreparationActivity.class);
             startActivity(intent);
-            //todo Ian
         });
     }
 
