@@ -1,4 +1,4 @@
-package com.honhai.foxconn.hometank.views;
+package com.honhai.foxconn.hometank.views.keys;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,8 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class TurnRightKey extends View {
-    public TurnRightKey(Context context, @Nullable AttributeSet attrs) {
+public class TurnLeftKey extends View {
+    public TurnLeftKey(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         path = new Path();
         triangle = new Path();
@@ -38,9 +38,9 @@ public class TurnRightKey extends View {
         int w = getWidth()/2;
         int h = getHeight()/2;
         path.reset();
-        path.addArc(-w+d+e,-h+d+e,w-d-e,h-d-e,-90,-180);
+        path.addArc(-w+d+e,-h+d+e,w-d-e,h-d-e,-90,180);
         triangle.moveTo(0,h);
-        triangle.lineTo(w/2,h-e-d);
+        triangle.lineTo(-w/2,h-e-d);
         triangle.lineTo(0,h-2*(e+d));
         triangle.close();
     }
@@ -48,7 +48,6 @@ public class TurnRightKey extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         setPath();
 
         canvas.save();

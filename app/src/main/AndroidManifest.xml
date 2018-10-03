@@ -11,11 +11,17 @@
         android:theme="@style/AppTheme">
         <activity android:name=".GameActivity"
             android:screenOrientation="sensorLandscape">
+        </activity>
+        <activity android:name=".WelcomeActivity"
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".PreparationActivity"
+            android:screenOrientation="sensorLandscape">
         </activity>
     </application>
 

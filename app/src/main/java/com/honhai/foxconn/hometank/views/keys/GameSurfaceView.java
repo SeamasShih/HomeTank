@@ -1,11 +1,17 @@
-package com.honhai.foxconn.hometank.views;
+package com.honhai.foxconn.hometank.views.keys;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -19,7 +25,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private int mWidth , mHeight;
     private Paint fogPaint = new Paint();
     private Path fog;
-    GameData gameData = GameData.getInstance();
+    private GameData gameData = GameData.getInstance();
 
     public GameSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -41,17 +47,13 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mWidth = getWidth();
-        mHeight = getHeight();
-        fog.addCircle(0,0,getHeight()/2, Path.Direction.CCW);
-    }
-
-    @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mIsDrawing = true;
         new Thread(this).start();
+        mWidth = getWidth();
+        mHeight = getHeight();
+        fog.reset();
+        fog.addCircle(0,0,mHeight/2, Path.Direction.CCW);
     }
 
     @Override
@@ -80,6 +82,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             gameData.drawMap(mCanvas);
             gameData.drawMyself(mCanvas);
             gameData.drawBullet(mCanvas);
+            gameData.drawBoom(mCanvas);
 
             mCanvas.drawPath(fog,fogPaint);
         }catch (Exception e){

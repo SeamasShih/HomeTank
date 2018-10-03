@@ -1,5 +1,9 @@
 package com.honhai.foxconn.hometank;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,19 +11,27 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 
 import com.honhai.foxconn.hometank.gameplay.GameData;
+import com.honhai.foxconn.hometank.views.keys.FireKey;
 
 public class GameActivity extends AppCompatActivity {
 
     private GameData gameData = GameData.getInstance();
-    private View up,down, left, right , raise , lower , fire , gunLeft , gunRight;
+    private View up,down, left, right , raise , lower  , gunLeft , gunRight;
+    private TextView textView;
+    private FireKey fire;
     private boolean goUp = false;
     private boolean goDown = false;
     private boolean goLeft = false;
     private boolean goRight = false;
     private boolean goGunRight = false;
     private boolean goGunLeft = false;
+    private int bulletAmount = 4;
+    private ValueAnimator bulletCD;
+    private ValueAnimator bulletAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +41,36 @@ public class GameActivity extends AppCompatActivity {
 
         findViews();
         setListener();
+        gameData.setBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.boom));
+        setAnimation();
+        textView.setText(String.valueOf(bulletAmount));
+    }
+
+    private void setAnimation() {
+        bulletCD = ValueAnimator.ofFloat(0,100);
+        bulletCD.setInterpolator(new LinearInterpolator());
+        bulletCD.setDuration(gameData.getMySpeed()*150);
+        bulletCD.addUpdateListener(animation -> {
+            float value = (float) animation.getAnimatedValue();
+            fire.setCD(value);
+        });
+        bulletAdd = ValueAnimator.ofFloat(0,100);
+        bulletAdd.setInterpolator(new LinearInterpolator());
+        bulletAdd.setDuration(gameData.getMySpeed()*400);
+        bulletAdd.addUpdateListener(animation -> {
+            float value = (float) animation.getAnimatedValue();
+            fire.setAddTime(value);
+        });
+        bulletAdd.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                bulletAmount++;
+                textView.setText(String.valueOf(bulletAmount));
+                if (bulletAmount < 4)
+                    bulletAdd.start();
+            }
+        });
     }
 
 
@@ -43,7 +85,16 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setFireListener() {
-        fire.setOnClickListener(v -> gameData.addBullet(gameData.getMySelf()));
+        fire.setOnClickListener(v -> {
+            if (bulletAmount > 0 && !bulletCD.isRunning()) {
+                gameData.addBullet(gameData.getMySelf());
+                bulletAmount--;
+                textView.setText(String.valueOf(bulletAmount));
+                bulletCD.start();
+                if (!bulletAdd.isRunning())
+                    bulletAdd.start();
+            }
+        });
     }
 
     private void setGunLeftListener() {
@@ -240,5 +291,6 @@ public class GameActivity extends AppCompatActivity {
         gunLeft = findViewById(R.id.turnLeftKey);
         gunRight = findViewById(R.id.turnRightKey);
         fire = findViewById(R.id.fireKey);
+        textView = findViewById(R.id.amount);
     }
 }

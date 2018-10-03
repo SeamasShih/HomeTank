@@ -1,9 +1,12 @@
 package com.honhai.foxconn.hometank.gameplay;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
@@ -26,9 +29,13 @@ public class GameData {
     private float interval = 120;
     private Box myBox = new Box(interval*.8f,interval*.6f);
     private Bullet[] bullets = new Bullet[15];
+    private Boom[] booms = new Boom[15];
     private BulletPicture bulletPicture = new BulletPicture();
     private float bulletL = interval*2/5;
     private int bulletSite = 0;
+    private int boomSite = 0;
+    private Bitmap bitmap;
+    private int boomL = (int) interval/4;
 
 
     private GameData(){
@@ -66,6 +73,10 @@ public class GameData {
     public void setMySite(float x , float y){
         mine.x = x;
         mine.y = y;
+    }
+
+    public void setBitmap(Bitmap bitmap){
+        this.bitmap = bitmap;
     }
 
     public void littleStepMySite(){
@@ -139,6 +150,13 @@ public class GameData {
         canvas.restore();
     }
 
+    public void addBoom(float x , float y){
+        while (booms[boomSite] != null){
+            boomSite = (boomSite +1) % booms.length ;
+        }
+        booms[boomSite] = new Boom(x,y,boomSite);
+    }
+
     public void gunRight(){
         mine.gunTheta++;
     }
@@ -147,18 +165,32 @@ public class GameData {
         mine.gunTheta--;
     }
 
+    public void drawBoom(Canvas canvas){
+        for (Boom boom : booms) {
+            if (boom != null){
+                int dx = (int) (boom.x - getX());
+                int dy = (int) (boom.y - getY());
+                canvas.drawBitmap(bitmap,
+                        new Rect(0,0,bitmap.getWidth(),bitmap.getHeight()),
+                        new Rect(dx-boomL,dy-boomL,dx+boomL,dy+boomL),
+                        new Paint());
+            }
+        }
+
+    }
+
     public void drawMyself(Canvas canvas) {
         mine.draw(canvas);
     }
 
     public void drawBullet(Canvas canvas){
-        for (int i = 0 ; i < bullets.length ; i++){
-            if (bullets[i] != null) {
-                float siteX = bullets[i].x - getX();
-                float siteY = bullets[i].y - getY();
+        for (Bullet bullet : bullets) {
+            if (bullet != null) {
+                float siteX = bullet.x - getX();
+                float siteY = bullet.y - getY();
                 canvas.save();
-                canvas.rotate(bullets[i].box.theta,siteX,siteY);
-                canvas.drawPicture(bulletPicture.getPicture(),new RectF(siteX-bulletL/2,siteY-bulletL/2,siteX+bulletL/2,siteY+bulletL/2));
+                canvas.rotate(bullet.box.theta, siteX, siteY);
+                canvas.drawPicture(bulletPicture.getPicture(), new RectF(siteX - bulletL / 2, siteY - bulletL / 2, siteX + bulletL / 2, siteY + bulletL / 2));
                 canvas.restore();
             }
         }
@@ -180,8 +212,36 @@ public class GameData {
         bullets[site] = null;
     }
 
+    public void nullBoom(int site){
+        booms[site] = null;
+    }
+
     public Player getMySelf(){
         return mine;
+    }
+
+    private class Boom extends Thread{
+        public float x;
+        public float y;
+        public int site;
+
+        public Boom(float x , float y , int site){
+            this.x = x;
+            this.y = y;
+            this.site = site;
+            start();
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            nullBoom(site);
+        }
     }
 
     private class Bullet extends Thread{
@@ -242,6 +302,7 @@ public class GameData {
                 }
                 ct = System.currentTimeMillis();
             }
+            addBoom(x,y);
             nullBullet(site);
         }
     }

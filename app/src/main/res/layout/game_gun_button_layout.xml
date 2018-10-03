@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.honhai.foxconn.hometank.views.RaiseKey
+    <com.honhai.foxconn.hometank.views.keys.RaiseKey
         android:id="@+id/raiseKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toTopOf="@+id/turnRightKey"
         app:layout_constraintEnd_toStartOf="@+id/turnRightKey" />
 
-    <com.honhai.foxconn.hometank.views.RaiseKey
+    <com.honhai.foxconn.hometank.views.keys.RaiseKey
         android:id="@+id/lowerKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -24,7 +24,7 @@
         app:layout_constraintStart_toEndOf="@+id/turnLeftKey"
         app:layout_constraintTop_toBottomOf="@id/turnLeftKey" />
 
-    <com.honhai.foxconn.hometank.views.TurnLeftKey
+    <com.honhai.foxconn.hometank.views.keys.TurnLeftKey
         android:id="@+id/turnLeftKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -33,7 +33,7 @@
         app:layout_constraintEnd_toStartOf="@+id/raiseKey"
         app:layout_constraintTop_toBottomOf="@id/raiseKey" />
 
-    <com.honhai.foxconn.hometank.views.TurnLeftKey
+    <com.honhai.foxconn.hometank.views.keys.TurnLeftKey
         android:id="@+id/turnRightKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -42,7 +42,7 @@
         app:layout_constraintBottom_toTopOf="@id/lowerKey"
         app:layout_constraintStart_toEndOf="@id/lowerKey" />
 
-    <com.honhai.foxconn.hometank.views.FireKey
+    <com.honhai.foxconn.hometank.views.keys.FireKey
         android:id="@+id/fireKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -50,6 +50,16 @@
         app:layout_constraintTop_toBottomOf="@id/raiseKey"
         app:layout_constraintBottom_toTopOf="@id/lowerKey"
         app:layout_constraintStart_toEndOf="@id/turnLeftKey"
+        app:layout_constraintEnd_toStartOf="@id/turnRightKey"/>
+
+    <TextView
+        android:id="@+id/amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:clickable="false"
+        app:layout_constraintTop_toBottomOf="@id/raiseKey"
         app:layout_constraintEnd_toStartOf="@id/turnRightKey"/>
 
 </android.support.constraint.ConstraintLayout>

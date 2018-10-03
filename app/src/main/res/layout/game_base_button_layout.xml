@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.honhai.foxconn.hometank.views.UpKey
+    <com.honhai.foxconn.hometank.views.keys.UpKey
         android:id="@+id/upKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toTopOf="@+id/rightKey"
         app:layout_constraintEnd_toStartOf="@+id/rightKey" />
 
-    <com.honhai.foxconn.hometank.views.DownKey
+    <com.honhai.foxconn.hometank.views.keys.DownKey
         android:id="@+id/downKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -24,7 +24,7 @@
         app:layout_constraintStart_toEndOf="@+id/leftKey"
         app:layout_constraintTop_toBottomOf="@id/leftKey" />
 
-    <com.honhai.foxconn.hometank.views.TurnRightKey
+    <com.honhai.foxconn.hometank.views.keys.TurnRightKey
         android:id="@+id/leftKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"
@@ -33,7 +33,7 @@
         app:layout_constraintEnd_toStartOf="@+id/upKey"
         app:layout_constraintTop_toBottomOf="@id/upKey" />
 
-    <com.honhai.foxconn.hometank.views.TurnLeftKey
+    <com.honhai.foxconn.hometank.views.keys.TurnLeftKey
         android:id="@+id/rightKey"
         android:layout_width="@dimen/length"
         android:layout_height="@dimen/length"

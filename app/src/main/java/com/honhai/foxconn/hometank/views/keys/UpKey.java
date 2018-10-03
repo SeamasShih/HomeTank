@@ -1,4 +1,4 @@
-package com.honhai.foxconn.hometank.views;
+package com.honhai.foxconn.hometank.views.keys;
 
 import android.content.Context;
 import android.graphics.Canvas;
