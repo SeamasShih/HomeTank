@@ -29,7 +29,7 @@ public class GameData {
     private BoxSet boxSet = new BoxSet();
     private MapData[][] mapData;
 //    private Player mine = new Player();
-    private Player[] players = new Player[4];
+    private Player[] players;
     private int myOrder;
     private float interval = 120;
 //    private Box myBox = new Box(interval*.8f,interval*.6f);
@@ -131,6 +131,15 @@ public class GameData {
         return gameData;
     }
 
+    public void createPlayers(int amount){
+        if (players != null)
+            return;
+        players = new Player[amount];
+        for (int i = 0 ; i < players.length ; i++){
+            players[i] = new Player();
+        }
+    }
+
     public void setMyOrder(int myOrder) {
         this.myOrder = myOrder;
     }
@@ -150,6 +159,10 @@ public class GameData {
     public void setMySite(float x , float y){
         getMySelf().x = x;
         getMySelf().y = y;
+    }
+
+    public void setPlayersSite(int order , float x , float y , float theta){
+        getPlayer(order).set(x,y,theta);
     }
 
     public void setBitmap(Bitmap bitmap){
@@ -398,7 +411,7 @@ public class GameData {
         public int type = 1;
         public TankPrototype tank = new HeavyTank();
 
-        public void setSite(){
+        public void setSiteByBox(){
             x = box.centre.x;
             y = box.centre.y;
         }
@@ -445,6 +458,14 @@ public class GameData {
             canvas.rotate(gunTheta+90);
             canvas.drawPicture(tank.getGunPicture(),new RectF(-interval/2,-interval/2,interval/2,interval/2));
             canvas.restore();
+        }
+
+        public void set(float x, float y, float theta) {
+            this.x += x;
+            this.y += y;
+            box.set(x,y);
+            this.theta = theta;
+            box.theta = theta;
         }
     }
 }
