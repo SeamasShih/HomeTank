@@ -46,5 +46,4 @@ public enum MapData {
     RIVER_SEA_NR,
     RIVER_SEA_ND,
     RIVER_SEA_NL
-
 }

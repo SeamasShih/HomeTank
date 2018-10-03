@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Picture;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -17,6 +18,8 @@ import com.honhai.foxconn.hometank.gameplay.tankdrawable.TankPrototype;
 import com.honhai.foxconn.hometank.map.MapData;
 import com.honhai.foxconn.hometank.collision.Box;
 import com.honhai.foxconn.hometank.collision.BoxSet;
+import com.honhai.foxconn.hometank.map.MapFunction;
+import com.honhai.foxconn.hometank.map.MapPicture;
 
 import java.util.ArrayList;
 
@@ -25,9 +28,11 @@ public class GameData {
     private static GameData gameData = new GameData();
     private BoxSet boxSet = new BoxSet();
     private MapData[][] mapData;
-    private Player mine = new Player();
+//    private Player mine = new Player();
+    private Player[] players = new Player[4];
+    private int myOrder;
     private float interval = 120;
-    private Box myBox = new Box(interval*.8f,interval*.6f);
+//    private Box myBox = new Box(interval*.8f,interval*.6f);
     private Bullet[] bullets = new Bullet[15];
     private Boom[] booms = new Boom[15];
     private BulletPicture bulletPicture = new BulletPicture();
@@ -36,13 +41,13 @@ public class GameData {
     private int boomSite = 0;
     private Bitmap bitmap;
     private int boomL = (int) interval/4;
+    private Picture map = new Picture();
 
 
     private GameData(){
 
         initialTestMap();
 
-        myBox.rotation(0);
     }
 
     private void initialTestMap(){
@@ -55,24 +60,96 @@ public class GameData {
                     mapData[i][j] = MapData.TEST_PILLAR;
             }
         }
+        checkMapRoad(mapData);
         boxSet.setMapBox(mapData , interval);
+        map = MapPicture.createMap(mapData,interval);
+    }
+
+    private void checkMapRoad(MapData[][] mapData) {
+        int road;
+        for (int i = 0 ; i < mapData.length ; i++){
+            for (int j = 0 ; j < mapData[0].length ; j++) {
+                if (!MapFunction.isRoad(mapData[i][j]))
+                    continue;
+                road = 0;
+                if (i != 0 && MapFunction.isRoad(mapData[i - 1][j]))
+                    road |= 0b0001; //left
+                if (j != 0 && MapFunction.isRoad(mapData[i][j - 1]))
+                    road |= 0b0010; // top
+                if (i != mapData.length - 1 && MapFunction.isRoad(mapData[i + 1][j]))
+                    road |= 0b0100; // right
+                if (j != mapData[0].length - 1 && MapFunction.isRoad(mapData[i][j + 1]))
+                    road |= 0b1000; // bottom
+                switch (road) {
+                    case 0b0001:
+                        break;
+                    case 0b0010:
+                        break;
+                    case 0b0100:
+                        break;
+                    case 0b1000:
+                        break;
+                    case 0b0011:
+                        mapData[i][j] = MapData.ROAD_BEND_TL;
+                        break;
+                    case 0b0101:
+                        mapData[i][j] = MapData.ROAD_LINE_H;
+                        break;
+                    case 0b1001:
+                        mapData[i][j] = MapData.ROAD_BEND_DL;
+                        break;
+                    case 0b0111:
+                        mapData[i][j] = MapData.ROAD_TRI_ND;
+                        break;
+                    case 0b1011:
+                        mapData[i][j] = MapData.ROAD_TRI_NR;
+                        break;
+                    case 0b1101:
+                        mapData[i][j] = MapData.ROAD_TRI_NT;
+                        break;
+                    case 0b1111:
+                        mapData[i][j] = MapData.ROAD_CROSS;
+                        break;
+                    case 0b0110:
+                        mapData[i][j] = MapData.ROAD_BEND_TR;
+                        break;
+                    case 0b1010:
+                        mapData[i][j] = MapData.ROAD_LINE_V;
+                        break;
+                    case 0b1110:
+                        mapData[i][j] = MapData.ROAD_TRI_NL;
+                        break;
+                    case 0b1100:
+                        mapData[i][j] = MapData.ROAD_BEND_DR;
+                        break;
+                }
+            }
+        }
     }
 
     public static GameData getInstance(){
         return gameData;
     }
 
+    public void setMyOrder(int myOrder) {
+        this.myOrder = myOrder;
+    }
+
+    public int getMyOrder() {
+        return myOrder;
+    }
+
     public float getX(){
-        return mine.x;
+        return getMySelf().x;
     }
 
     public float getY(){
-        return mine.y;
+        return getMySelf().y;
     }
 
     public void setMySite(float x , float y){
-        mine.x = x;
-        mine.y = y;
+        getMySelf().x = x;
+        getMySelf().y = y;
     }
 
     public void setBitmap(Bitmap bitmap){
@@ -80,73 +157,76 @@ public class GameData {
     }
 
     public void littleStepMySite(){
-        mine.littleStep();
+        getMySelf().littleStep();
     }
 
     public void littleStepRotationMySite(){
-        mine.littleStepRotation();
+        getMySelf().littleStepRotation();
     }
 
     public void littleStepBackMySite(){
-        mine.littleBackStep();
+        getMySelf().littleBackStep();
     }
 
     public void littleBackStepRotationMySite(){
-        mine.littleBackStepRotation();
+        getMySelf().littleBackStepRotation();
+    }
+
+    public Player getPlayer(int order){
+        if (order < players.length && order >= 0)
+            return players[order];
+        else
+            return null;
+    }
+
+    public Box getPlayerBox(int order){
+        if (order < players.length && order >= 0)
+            return players[order].box;
+        else
+            return null;
+    }
+
+    public Box getMyBox(){
+        return getMySelf().box;
     }
 
     public long getMySpeed(){
-        return mine.speed;
+        return getMySelf().speed;
     }
 
     public boolean checkCollision(){
-        return boxSet.checkCollision(myBox);
+        return boxSet.checkCollision(getMyBox());
     }
 
     public void offsetMyBox(float x , float y){
-        myBox.offset(x , y );
+        getMyBox().offset(x , y );
     }
 
     public void littleStepMyBox(){
-        myBox.littleStep();
+        getMyBox().littleStep();
     }
 
     public void littleStepRotationMyBox(){
-        myBox.littleStepRotation();
+        getMyBox().littleStepRotation();
     }
 
     public void littleStepBackMyBox(){
-        myBox.littleBackStep();
+        getMyBox().littleBackStep();
     }
 
     public void littleStepBackRotationMyBox(){
-        myBox.littleStepBackRotation();
+        getMyBox().littleStepBackRotation();
     }
 
     public void setMyBox(float x , float y){
-        myBox.set(x , y );
+        getMyBox().set(x , y );
     }
 
     public void drawMap(Canvas canvas) {
         canvas.save();
         canvas.translate(-interval/2,-interval/2);
-        canvas.translate(-mine.x,-mine.y);
-        Paint one = new Paint();
-        one.setColor(Color.CYAN);
-        Paint two = new Paint();
-        two.setColor(Color.BLUE);
-        for (int i = 0; i < mapData.length; i++) {
-            for (int j = 0; j < mapData[0].length; j++) {
-                switch (mapData[i][j]) {
-                    case TEST_ROAD:
-                        canvas.drawRect(i * interval, j * interval, (i + 1) * interval, (j + 1) * interval, one);
-                        break;
-                    case TEST_PILLAR:
-                        canvas.drawRect(i * interval, j * interval, (i + 1) * interval, (j + 1) * interval, two);
-                        break;
-                }
-            }
-        }
+        canvas.translate(-getMySelf().x,-getMySelf().y);
+        canvas.drawPicture(map);
         canvas.restore();
     }
 
@@ -158,11 +238,11 @@ public class GameData {
     }
 
     public void gunRight(){
-        mine.gunTheta++;
+        getMySelf().gunTheta++;
     }
 
     public void gunLeft(){
-        mine.gunTheta--;
+        getMySelf().gunTheta--;
     }
 
     public void drawBoom(Canvas canvas){
@@ -180,7 +260,7 @@ public class GameData {
     }
 
     public void drawMyself(Canvas canvas) {
-        mine.draw(canvas);
+        getMySelf().draw(canvas);
     }
 
     public void drawBullet(Canvas canvas){
@@ -217,7 +297,7 @@ public class GameData {
     }
 
     public Player getMySelf(){
-        return mine;
+        return getPlayer(myOrder);
     }
 
     private class Boom extends Thread{
@@ -309,6 +389,7 @@ public class GameData {
 
     private class Player{
 
+        public Box box = new Box(interval*.8f,interval*.6f);
         public float x;
         public float y;
         public float theta = 0;
@@ -316,6 +397,15 @@ public class GameData {
         public long speed = 10;
         public int type = 1;
         public TankPrototype tank = new HeavyTank();
+
+        public void setSite(){
+            x = box.centre.x;
+            y = box.centre.y;
+        }
+
+        public void setRotation(){
+            theta = box.theta;
+        }
 
         public void offset(float x , float y){
             this.x += x;

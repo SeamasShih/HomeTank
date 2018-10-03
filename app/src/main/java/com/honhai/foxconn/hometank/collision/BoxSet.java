@@ -17,9 +17,6 @@ public class BoxSet {
         for (int i = 0; i < mapData.length; i++) {
             for (int j = 0; j < mapData[0].length; j++) {
                 switch (mapData[i][j]) {
-                    case TEST_ROAD:
-                        mapBox[i][j] = null;
-                        break;
                     case TEST_PILLAR:
                         mapBox[i][j] = new Box(interval,interval);
                         mapBox[i][j].offset(i*interval,j*interval);
