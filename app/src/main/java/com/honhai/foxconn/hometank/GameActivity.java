@@ -4,9 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -119,6 +118,9 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                         while (goGunLeft) {
                             try {
                                 gameData.gunLeft();
+                                udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_GUN_ROTATION
+                                        + gameData.getMyOrder()
+                                        + " " + gameData.getMyGunTheta());
                                 Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -145,6 +147,9 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                         while (goGunRight) {
                             try {
                                 gameData.gunRight();
+                                udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_GUN_ROTATION
+                                        + gameData.getMyOrder()
+                                        + " " + gameData.getMyGunTheta());
                                 Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -173,6 +178,9 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 gameData.littleStepBackRotationMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleBackStepRotationMySite();
+                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_DIR
+                                            + gameData.getMyOrder()
+                                            + " " + gameData.getMyTheta());
                                 } else {
                                     gameData.littleStepRotationMyBox();
                                     goRight = false;
@@ -205,6 +213,9 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 gameData.littleStepRotationMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepRotationMySite();
+                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_DIR
+                                            + gameData.getMyOrder()
+                                            + " " + gameData.getMyTheta());
                                 } else {
                                     gameData.littleStepBackRotationMyBox();
                                     goLeft = false;
@@ -237,6 +248,10 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 gameData.littleStepBackMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepBackMySite();
+                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_SITE
+                                            + gameData.getMyOrder()
+                                            + " " + gameData.getX()
+                                            + " " + gameData.getY());
                                 } else {
                                     gameData.littleStepMyBox();
                                     goUp = false;
@@ -270,9 +285,9 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepMySite();
                                     udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_SITE
-                                                    + gameData.getMyOrder()
-                                                    + " " + gameData.getX()
-                                                    + " " + gameData.getY());
+                                            + gameData.getMyOrder()
+                                            + " " + gameData.getX()
+                                            + " " + gameData.getY());
                                 } else {
                                     gameData.littleStepBackMyBox();
                                     goUp = false;
@@ -326,11 +341,19 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             float x = Float.valueOf(tokenizer.nextToken());
             float y = Float.valueOf(tokenizer.nextToken());
             gameData.setPlayersSite(order, x, y);
-            Log.d(TAG, "onUdpMessageReceive: order : " + order + ", x : " + x + ", y : " + y);
-        } else if (message.startsWith(UdpSerCliConstant.C_TANK_GUN_ROTATION)) {
-            Log.d(TAG, "onUdpMessageReceive: rotation : " + message);
+        } else if (message.startsWith(UdpSerCliConstant.C_TANK_DIR)) {
+            StringTokenizer tokenizer = new StringTokenizer(message, " ");
 
-            int order = Character.getNumericValue(message.charAt(UdpSerCliConstant.C_TANK_GUN_ROTATION.length()));
+            int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_DIR.length()));
+            float theta = Float.valueOf(tokenizer.nextToken());
+            gameData.setPlayersSite(order, theta);
+        } else if (message.startsWith(UdpSerCliConstant.C_TANK_GUN_ROTATION)) {
+            StringTokenizer tokenizer = new StringTokenizer(message, " ");
+
+            int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_DIR.length()));
+            float theta = Float.valueOf(tokenizer.nextToken());
+
+            gameData.setPlayerGunTheta(order, theta);
         }
     }
 }

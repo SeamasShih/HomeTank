@@ -143,6 +143,10 @@ public class GameData {
         }
     }
 
+    public float getMyTheta() {
+        return getMySelf().theta;
+    }
+
     public int getPlayerAmount() {
         return players.length;
     }
@@ -275,6 +279,14 @@ public class GameData {
 
     public void gunLeft() {
         getMySelf().gunTheta--;
+    }
+
+    public void setPlayerGunTheta(int order, float gunTheta) {
+        getPlayer(order).gunTheta = gunTheta;
+    }
+
+    public float getMyGunTheta() {
+        return getMySelf().gunTheta;
     }
 
     public void drawBoom(Canvas canvas) {
@@ -477,16 +489,20 @@ public class GameData {
         public void draw(Canvas canvas) {
             float dx = x - getX();
             float dy = y - getY();
-//            Log.d(TAG, "draw: dx : " + dx + ", dy : " + dy);
+
             canvas.save();
+            canvas.translate(dx,dy);
             canvas.rotate(theta);
-            canvas.drawPicture(tank.getBasePicture(), new RectF(dx-interval / 2, dy-interval / 2,
-                    dx+interval / 2, dy+interval / 2));
+            canvas.drawPicture(tank.getBasePicture(), new RectF(
+                    -interval / 2, -interval / 2,
+                    interval / 2, interval / 2));
             canvas.restore();
             canvas.save();
+            canvas.translate(dx,dy);
             canvas.rotate(gunTheta);
-            canvas.drawPicture(tank.getGunPicture(), new RectF(dx-interval / 2, dy-interval / 2,
-                    dx+interval / 2, dy+interval / 2));
+            canvas.drawPicture(tank.getGunPicture(), new RectF(
+                    -interval / 2, -interval / 2,
+                    interval / 2, interval / 2));
             canvas.restore();
         }
 
