@@ -17,7 +17,6 @@ public class FireKey extends View {
         body = new Path();
         base = new Path();
         CDpath = new Path();
-        addPath = new Path();
         white = new Paint();
         white.setColor(Color.LTGRAY);
         white.setAntiAlias(true);
@@ -26,13 +25,8 @@ public class FireKey extends View {
         red.setColor(Color.RED);
         red.setAntiAlias(true);
         red.setStyle(Paint.Style.FILL);
-        black = new Paint();
-        black.setColor(Color.LTGRAY);
-        black.setAntiAlias(true);
-        black.setStyle(Paint.Style.STROKE);
-        black.setStrokeWidth(d);
         CD = new Paint();
-        CD.setColor(Color.argb(100,0,0,0));
+        CD.setColor(Color.DKGRAY);
         CD.setAntiAlias(true);
         CD.setStyle(Paint.Style.FILL);
     }
@@ -41,7 +35,6 @@ public class FireKey extends View {
     private Path body;
     private Path base;
     private Path CDpath;
-    private Path addPath;
     private Paint red;
     private Paint white;
     private Paint black;
@@ -52,11 +45,6 @@ public class FireKey extends View {
 
     public void setCD(float procedure){
         CDtime = procedure;
-        invalidate();
-    }
-
-    public void setAddTime(float addTime){
-        this.addTime = addTime;
         invalidate();
     }
 
@@ -77,8 +65,6 @@ public class FireKey extends View {
         CDpath.reset();
         CDpath.addRect(-w/2,-h*2.6f,w/2,-h*2.6f + h*4.6f*(100-CDtime)/100, Path.Direction.CCW);
 
-        addPath.reset();
-        addPath.addRect(-w/2,-h*2.6f,w/2,-h*2.6f + h*4.6f*(100-addTime)/100, Path.Direction.CCW);
     }
 
     @Override
@@ -98,19 +84,6 @@ public class FireKey extends View {
 
         canvas.drawPath(body,white);
         canvas.drawPath(CDpath,CD);
-
-        canvas.rotate(45);
-        canvas.translate(-getWidth()/3,getHeight()/3);
-        canvas.scale(.4f,.4f);
-
-        canvas.save();
-        canvas.translate(0,-getHeight()/4);
-        canvas.scale(1,1.4f);
-        canvas.drawPath(head,red);
-        canvas.restore();
-
-        canvas.drawPath(body,white);
-        canvas.drawPath(addPath,CD);
 
         canvas.restore();
     }
