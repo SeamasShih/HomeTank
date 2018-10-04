@@ -14,9 +14,9 @@ import com.honhai.foxconn.hometank.network.UdpTankClient;
 
 public class PreparationActivity extends AppCompatActivity implements UdpReceiveListener {
 
-    Button button;
-    TextView textView;
-    GameData gameData = GameData.getInstance();
+    private Button button;
+    private TextView textView;
+    private GameData gameData = GameData.getInstance();
     private UdpTankClient udpTankClient;
 
     @Override

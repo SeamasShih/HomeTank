@@ -10,6 +10,11 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class RaiseKey extends View {
+
+    private Path path;
+    private Paint white;
+    private int d = 10;
+
     public RaiseKey(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         path = new Path();
@@ -19,10 +24,6 @@ public class RaiseKey extends View {
         white.setStyle(Paint.Style.STROKE);
         white.setStrokeWidth(d);
     }
-
-    Path path;
-    Paint white;
-    int d = 10;
 
     private void setPath() {
         int w = getWidth()/2;

@@ -10,6 +10,10 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class UpKey extends View {
+
+    private Path path;
+    private Paint white;
+
     public UpKey(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         path = new Path();
@@ -18,8 +22,6 @@ public class UpKey extends View {
         white.setAntiAlias(true);
     }
 
-    Path path;
-    Paint white;
 
     @Override
     public boolean performClick() {

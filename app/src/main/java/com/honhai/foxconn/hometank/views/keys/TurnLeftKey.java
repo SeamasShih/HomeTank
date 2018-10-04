@@ -10,6 +10,14 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class TurnLeftKey extends View {
+
+    private Path path;
+    private Path triangle;
+    private Paint white;
+    private Paint fill;
+    private int d = 10;
+    private int e = 10;
+
     public TurnLeftKey(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         path = new Path();
@@ -24,15 +32,6 @@ public class TurnLeftKey extends View {
         fill.setAntiAlias(true);
         fill.setStyle(Paint.Style.FILL);
     }
-
-    Path path;
-    Path triangle;
-    Paint white;
-    Paint fill;
-
-    int d = 10;
-    int e = 10;
-
 
     private void setPath() {
         int w = getWidth()/2;
