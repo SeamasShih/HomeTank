@@ -1,26 +1,29 @@
 package com.honhai.foxconn.hometank.collision;
 
 import android.graphics.Matrix;
-import android.graphics.PointF;
-import android.util.Log;
 
 import com.honhai.foxconn.hometank.map.MapData;
+import com.honhai.foxconn.hometank.map.MapFunction;
 
 public class BoxSet {
 
     public Box[][] mapBox;
     public Box[] playerBox;
+    public MapData[][] mapData;
     private float interval = 120;
 
     public void setMapBox(MapData[][] mapData , float interval) {
+        this.mapData = mapData;
         mapBox = new Box[mapData.length][mapData[0].length];
         for (int i = 0; i < mapData.length; i++) {
             for (int j = 0; j < mapData[0].length; j++) {
-                switch (mapData[i][j]) {
-                    case TEST_PILLAR:
-                        mapBox[i][j] = new Box(interval,interval);
-                        mapBox[i][j].offset(i*interval,j*interval);
-                        break;
+                if (MapFunction.isRiver(mapData[i][j])){
+                    mapBox[i][j] = new Box(interval*.8f,interval*.8f);
+                    mapBox[i][j].offset(i*interval,j*interval);
+                }
+                else if(mapData[i][j] == MapData.BRICK){
+                    mapBox[i][j] = new Box(interval,interval);
+                    mapBox[i][j].offset(i*interval,j*interval);
                 }
             }
         }
@@ -28,6 +31,10 @@ public class BoxSet {
 
     public boolean checkCollision(Box box){
         return (onCheckWall(box) || onCheckMapBox(box));
+    }
+
+    public boolean checkBulletCollision(Box box){
+        return (onCheckWall(box) || onCheckBulletMapBox(box));
     }
 
     private boolean onCheckWall(Box box){
@@ -38,6 +45,22 @@ public class BoxSet {
         if (l < -interval/2 || r > interval*(mapBox.length) - interval/2 ||
                 t < -interval/2 || b > interval*(mapBox[0].length) - interval/2)
             return true;
+        return false;
+    }
+
+    private boolean onCheckBulletMapBox(Box box){
+        int x = (int)((box.centre.x-interval/2)/interval);
+        int y = (int)((box.centre.y-interval/2)/interval);
+        for (int i = x-2 ; i <= x+2 ; i++){
+            if (i < 0 || i >= mapBox.length) continue;
+            for (int j = y-2 ; j <= y+2 ; j++){
+                if (j < 0 || j >= mapBox[0].length || mapBox[i][j] == null ||
+                        MapFunction.isRiver(mapData[i][j])) ;
+                else if (onBoxCollision(box,mapBox[i][j])){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

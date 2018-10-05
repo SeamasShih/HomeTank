@@ -21,7 +21,6 @@ public class HeavyTank extends TankPrototype {
         Paint paint = new Paint();
         paint.setColor(Color.rgb(0x20,0x6b,0x20));
         paint.setAntiAlias(true);
-
         int w = 20;
         int h = (int) (w/2*1.732);
         int l = 5;
