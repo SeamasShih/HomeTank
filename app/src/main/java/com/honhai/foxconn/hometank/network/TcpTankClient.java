@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class TcpTankClient {
 
@@ -54,8 +55,9 @@ public class TcpTankClient {
                 try {
                     msg = dataInputStream.readUTF();
                     tcpReceiveListener.onTcpMessageReceive(msg);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
+                    break;
                 }
             }
 

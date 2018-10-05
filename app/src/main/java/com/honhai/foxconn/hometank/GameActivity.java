@@ -11,10 +11,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
-import android.widget.TextView;
 
 import com.honhai.foxconn.hometank.gameplay.GameData;
 import com.honhai.foxconn.hometank.network.TcpReceiveListener;
+import com.honhai.foxconn.hometank.network.TcpSerCliConstant;
 import com.honhai.foxconn.hometank.network.TcpTankClient;
 import com.honhai.foxconn.hometank.network.UdpReceiveListener;
 import com.honhai.foxconn.hometank.network.UdpSerCliConstant;
@@ -102,6 +102,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         fire.setOnClickListener(v -> {
             if (bulletAmount > 0 && !bulletCD.isRunning()) {
                 gameData.addBullet(gameData.getMySelf());
+                tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo());
                 bulletAmount--;
                 bulletAmountView.setAmount(bulletAmount);
                 bulletCD.start();
@@ -327,7 +328,18 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
 
     @Override
     public void onTcpMessageReceive(String message) {
+        if (message.startsWith(TcpSerCliConstant.C_FIRE)) {
+            StringTokenizer tokenizer = new StringTokenizer(message, " ");
 
+            int order = Character.getNumericValue(tokenizer.nextToken().charAt(TcpSerCliConstant.C_FIRE.length()));
+            if (gameData.getMyOrder() != order) {
+                int playerType = Integer.valueOf(tokenizer.nextToken());
+                float x = Float.valueOf(tokenizer.nextToken());
+                float y = Float.valueOf(tokenizer.nextToken());
+                float gunTheta = Float.valueOf(tokenizer.nextToken());
+                gameData.addBullet(playerType, x, y, System.currentTimeMillis(), gunTheta);
+            }
+        }
     }
 
     @Override
@@ -341,22 +353,27 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             StringTokenizer tokenizer = new StringTokenizer(message, " ");
 
             int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_SITE.length()));
-            float x = Float.valueOf(tokenizer.nextToken());
-            float y = Float.valueOf(tokenizer.nextToken());
-            gameData.setPlayersSite(order, x, y);
+            if (gameData.getMyOrder() != order) {
+                float x = Float.valueOf(tokenizer.nextToken());
+                float y = Float.valueOf(tokenizer.nextToken());
+                gameData.setPlayersSite(order, x, y);
+            }
         } else if (message.startsWith(UdpSerCliConstant.C_TANK_DIR)) {
             StringTokenizer tokenizer = new StringTokenizer(message, " ");
 
             int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_DIR.length()));
-            float theta = Float.valueOf(tokenizer.nextToken());
-            gameData.setPlayersSite(order, theta);
+            if (gameData.getMyOrder() != order) {
+                float theta = Float.valueOf(tokenizer.nextToken());
+                gameData.setPlayersSite(order, theta);
+            }
         } else if (message.startsWith(UdpSerCliConstant.C_TANK_GUN_ROTATION)) {
             StringTokenizer tokenizer = new StringTokenizer(message, " ");
 
-            int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_DIR.length()));
-            float theta = Float.valueOf(tokenizer.nextToken());
-
-            gameData.setPlayerGunTheta(order, theta);
+            int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_GUN_ROTATION.length()));
+            if (gameData.getMyOrder() != order) {
+                float theta = Float.valueOf(tokenizer.nextToken());
+                gameData.setPlayerGunTheta(order, theta);
+            }
         }
     }
 }

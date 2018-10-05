@@ -9,12 +9,12 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import com.honhai.foxconn.hometank.collision.Box;
+import com.honhai.foxconn.hometank.collision.BoxSet;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.BulletPicture;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeavyTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.TankPrototype;
 import com.honhai.foxconn.hometank.map.MapData;
-import com.honhai.foxconn.hometank.collision.Box;
-import com.honhai.foxconn.hometank.collision.BoxSet;
 import com.honhai.foxconn.hometank.map.MapFunction;
 import com.honhai.foxconn.hometank.map.MapPicture;
 
@@ -27,11 +27,9 @@ public class GameData {
     private static GameData gameData = new GameData();
     private BoxSet boxSet = new BoxSet();
     private MapData[][] mapData;
-    //    private Player mine = new Player();
     private Player[] players;
     private int myOrder = -1;
     private float interval = 120;
-    //    private Box myBox = new Box(interval*.8f,interval*.6f);
     private Bullet[] bullets = new Bullet[15];
     private Boom[] booms = new Boom[15];
     private BulletPicture bulletPicture = new BulletPicture();
@@ -784,8 +782,30 @@ public class GameData {
         Matrix matrix = new Matrix();
         matrix.setRotate(player.gunTheta);
         matrix.mapPoints(f);
+
         bullets[bulletSite] = new Bullet(player.type, player.x + f[0], player.y + f[1],
                 System.currentTimeMillis(), player.gunTheta, bulletSite);
+    }
+
+    public void addBullet(int playerType, float x, float y, long it, float gunTheta) {
+        while (bullets[bulletSite] != null) {
+            bulletSite = (bulletSite + 1) % bullets.length;
+        }
+        float[] f = new float[]{interval / 2 * 1.414f, 0};
+        Matrix matrix = new Matrix();
+        matrix.setRotate(gunTheta);
+        matrix.mapPoints(f);
+
+        bullets[bulletSite] = new Bullet(playerType, x + f[0], y + f[1],
+                it, gunTheta, bulletSite);
+    }
+
+    public String getBulletInfo() {
+        Player p = getMySelf();
+        return " " + p.type
+                + " " + p.x
+                + " " + p.y
+                + " " + p.gunTheta;
     }
 
     public void nullBullet(int site) {
@@ -941,14 +961,14 @@ public class GameData {
             float dy = y - getY();
 
             canvas.save();
-            canvas.translate(dx,dy);
+            canvas.translate(dx, dy);
             canvas.rotate(theta);
             canvas.drawPicture(tank.getBasePicture(), new RectF(
                     -interval / 2, -interval / 2,
                     interval / 2, interval / 2));
             canvas.restore();
             canvas.save();
-            canvas.translate(dx,dy);
+            canvas.translate(dx, dy);
             canvas.rotate(gunTheta);
             canvas.drawPicture(tank.getGunPicture(), new RectF(
                     -interval / 2, -interval / 2,
@@ -956,7 +976,7 @@ public class GameData {
             canvas.restore();
         }
 
-        public void set(float x,float y, float theta) {
+        public void set(float x, float y, float theta) {
             this.x += x;
             this.y += y;
             box.set(x, y);
@@ -964,7 +984,7 @@ public class GameData {
             box.theta = theta;
         }
 
-        public void set(float x,float y) {
+        public void set(float x, float y) {
             this.x = x;
             this.y = y;
             box.set(x, y);
