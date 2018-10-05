@@ -30,11 +30,12 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="20dp"
+        android:rotation="-90"
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
-    <com.honhai.foxconn.hometank.views.tanks.HeavyTankView
+    <com.honhai.foxconn.hometank.views.tanks.HeightTankView
         android:id="@+id/heightTank"
         android:layout_width="150dp"
         android:layout_height="150dp"

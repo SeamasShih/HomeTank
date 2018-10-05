@@ -2,6 +2,7 @@ package com.honhai.foxconn.hometank.gameplay;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Picture;
@@ -13,6 +14,7 @@ import com.honhai.foxconn.hometank.collision.Box;
 import com.honhai.foxconn.hometank.collision.BoxSet;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.BulletPicture;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeavyTank;
+import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeightTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.TankPrototype;
 import com.honhai.foxconn.hometank.map.MapData;
 import com.honhai.foxconn.hometank.map.MapFunction;
@@ -42,6 +44,11 @@ public class GameData {
     private int mapW = 27;
     private int mapH = 19;
     private int roadNum = mapW*mapH/3;
+
+    public int getMyType() {
+        return getMySelf().type;
+    }
+
     private enum GenerateMap{
         CONTAIN,
         INVALID,
@@ -50,10 +57,10 @@ public class GameData {
 
 
     private GameData() {
-//        initialMap();
-//        createPlayers(1);
-//        myOrder = 0;
-//        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
+        initialMap();
+        createPlayers(1);
+        myOrder = 0;
+        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
     }
 
     private void initialMap() {
@@ -722,11 +729,11 @@ public class GameData {
     }
 
     public void gunRight() {
-        getMySelf().gunTheta++;
+        getMySelf().gunRight();
     }
 
     public void gunLeft() {
-        getMySelf().gunTheta--;
+        getMySelf().gunLeft();
     }
 
     public void setPlayerGunTheta(int order, float gunTheta) {
@@ -798,6 +805,14 @@ public class GameData {
 
         bullets[bulletSite] = new Bullet(playerType, x + f[0], y + f[1],
                 it, gunTheta, bulletSite);
+    }
+
+    public void gunRaise(){
+        getMySelf().gunRaise();
+    }
+
+    public void gunLower(){
+        getMySelf().gunLower();
     }
 
     public String getBulletInfo() {
@@ -874,9 +889,6 @@ public class GameData {
                 case 1:
                     distance = interval * 4;
                     break;
-                case 2:
-                    distance = interval * 7;
-                    break;
             }
             float[] f = new float[]{distance, 0};
             matrix.mapPoints(f);
@@ -909,22 +921,81 @@ public class GameData {
 
     private class Player {
 
-        public Box box = new Box(interval * .8f, interval * .6f);
+        public Box box = new Box(interval * .6f, interval * .4f);
         public float x;
         public float y;
         public float theta = 0;
         public float gunTheta = 0;
-        public long speed = 10;
-        public int type = 1;
-        public TankPrototype tank = new HeavyTank();
+        public long speed = 8;
+        public int type = 2;
+        public float gunLength = 100;
+        public TankPrototype tank = new HeightTank();
+        Paint paint = new Paint();
+        Paint gunPaint = new Paint();
+        Matrix matrix = new Matrix();
+
+        public Player(){
+            paint.setAntiAlias(true);
+            paint.setColor(Color.argb(80,255,0,0));
+            gunPaint.setAntiAlias(true);
+            gunPaint.setColor(Color.rgb(0x20,0x6b,0x20));
+        }
+
+        public void gunRight(){
+            gunTheta++;
+            setMatrix();
+        }
+
+        public void gunLeft(){
+            gunTheta--;
+            setMatrix();
+        }
+
+        public void setType(int type) {
+            this.type = type;
+            switch (type){
+                case 0:
+                    break;
+                case 1:
+                    tank = new HeavyTank();
+                    box = new Box(interval * .8f, interval * .6f);
+                    speed = 10;
+                    break;
+                case 2:
+                    tank = new HeightTank();
+                    box = new Box(interval * .6f, interval * .4f);
+                    speed = 8;
+                    break;
+            }
+        }
 
         public void setSiteByBox() {
             x = box.centre.x;
             y = box.centre.y;
         }
 
+        public void gunRaise(){
+            if (gunLength >= 100) {
+                gunLength = 100;
+                return;
+            }
+            gunLength++;
+        }
+
+        public void gunLower(){
+            if (gunLength <= 30) {
+                gunLength = 30;
+                return;
+            }
+            gunLength--;
+        }
+
         public void setRotation() {
             theta = box.theta;
+        }
+
+        private void setMatrix(){
+            matrix.setRotate(gunTheta);
         }
 
         public void offset(float x, float y) {
@@ -973,6 +1044,13 @@ public class GameData {
             canvas.drawPicture(tank.getGunPicture(), new RectF(
                     -interval / 2, -interval / 2,
                     interval / 2, interval / 2));
+            if (type == 2){
+                canvas.rotate(90);
+                canvas.drawRect(-interval / 2*.02f, -interval / 2 * gunLength/100,
+                        interval / 2 *.02f, 0,gunPaint);
+                float l = (2 + (gunLength-30)*5/70)*interval;
+                canvas.drawCircle(0,-l,50,paint);
+            }
             canvas.restore();
         }
 

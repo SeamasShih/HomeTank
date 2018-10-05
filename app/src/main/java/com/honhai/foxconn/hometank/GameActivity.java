@@ -38,6 +38,8 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private boolean goRight = false;
     private boolean goGunRight = false;
     private boolean goGunLeft = false;
+    private boolean goRaise = false;
+    private boolean goLower = false;
     private int bulletAmount = 4;
     private ValueAnimator bulletCD;
     private ValueAnimator bulletAdd;
@@ -96,18 +98,87 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         setGunRightListener();
         setGunLeftListener();
         setFireListener();
+        setRaiseListener();
+        setLowerListener();
+    }
+
+    private void setLowerListener() {
+        lower.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    goLower = true;
+                    new Thread(() -> {
+                        while (goLower) {
+                            try {
+                                gameData.gunLower();
+                                //todo Ian
+                                Thread.sleep(gameData.getMySpeed()*3);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    goLower = false;
+                    break;
+            }
+            v.performClick();
+            return true;
+        });
+    }
+
+    private void setRaiseListener() {
+        raise.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    goRaise = true;
+                    new Thread(() -> {
+                        while (goRaise) {
+                            try {
+                                gameData.gunRaise();
+                                //todo Ian
+                                Thread.sleep(gameData.getMySpeed()*3);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    goRaise = false;
+                    break;
+            }
+            v.performClick();
+            return true;
+        });
     }
 
     private void setFireListener() {
         fire.setOnClickListener(v -> {
-            if (bulletAmount > 0 && !bulletCD.isRunning()) {
-                gameData.addBullet(gameData.getMySelf());
-                tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo());
-                bulletAmount--;
-                bulletAmountView.setAmount(bulletAmount);
-                bulletCD.start();
-                if (!bulletAdd.isRunning())
-                    bulletAdd.start();
+            if (gameData.getMyType() == 2){
+                if (bulletAmount > 0 && !bulletCD.isRunning()) {
+                    gameData.addBullet(gameData.getMySelf());
+                    //todo Ian
+                    bulletAmount--;
+                    bulletAmountView.setAmount(bulletAmount);
+                    bulletCD.start();
+                    if (!bulletAdd.isRunning())
+                        bulletAdd.start();
+                }
+            }
+            else {
+                if (bulletAmount > 0 && !bulletCD.isRunning()) {
+                    gameData.addBullet(gameData.getMySelf());
+                    tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo());
+                    bulletAmount--;
+                    bulletAmountView.setAmount(bulletAmount);
+                    bulletCD.start();
+                    if (!bulletAdd.isRunning())
+                        bulletAdd.start();
+                }
             }
         });
     }
