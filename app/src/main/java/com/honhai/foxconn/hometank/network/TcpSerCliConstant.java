@@ -7,5 +7,6 @@ public class TcpSerCliConstant {
 
 
     public final static String C_END = "end";
+    public final static String C_MAP = "m";
     public final static String C_FIRE = "f";
 }

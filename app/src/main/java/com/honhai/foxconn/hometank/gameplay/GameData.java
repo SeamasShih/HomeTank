@@ -41,10 +41,13 @@ public class GameData {
     private Picture map = new Picture();
 
 
-    private GameData() {
+    private GameData() { }
 
-        initialTestMap();
+    public void setMapData(MapData[][] data){
+        this.mapData = data;
 
+        boxSet.setMapBox(mapData, interval);
+        map = MapPicture.createMap(mapData, interval);
     }
 
     private void initialTestMap() {
