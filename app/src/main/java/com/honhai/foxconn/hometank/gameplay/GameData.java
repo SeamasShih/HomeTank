@@ -2,27 +2,21 @@ package com.honhai.foxconn.hometank.gameplay;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Picture;
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
+import com.honhai.foxconn.hometank.collision.Box;
+import com.honhai.foxconn.hometank.collision.BoxSet;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.BulletPicture;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeavyTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.TankPrototype;
 import com.honhai.foxconn.hometank.map.MapData;
-import com.honhai.foxconn.hometank.collision.Box;
-import com.honhai.foxconn.hometank.collision.BoxSet;
 import com.honhai.foxconn.hometank.map.MapFunction;
 import com.honhai.foxconn.hometank.map.MapPicture;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GameData {
@@ -334,8 +328,30 @@ public class GameData {
         Matrix matrix = new Matrix();
         matrix.setRotate(player.gunTheta);
         matrix.mapPoints(f);
+
         bullets[bulletSite] = new Bullet(player.type, player.x + f[0], player.y + f[1],
                 System.currentTimeMillis(), player.gunTheta, bulletSite);
+    }
+
+    public void addBullet(int playerType, float x, float y, long it, float gunTheta) {
+        while (bullets[bulletSite] != null) {
+            bulletSite = (bulletSite + 1) % bullets.length;
+        }
+        float[] f = new float[]{interval / 2 * 1.414f, 0};
+        Matrix matrix = new Matrix();
+        matrix.setRotate(gunTheta);
+        matrix.mapPoints(f);
+
+        bullets[bulletSite] = new Bullet(playerType, x + f[0], y + f[1],
+                it, gunTheta, bulletSite);
+    }
+
+    public String getBulletInfo() {
+        Player p = getMySelf();
+        return " " + p.type
+                + " " + p.x
+                + " " + p.y
+                + " " + p.gunTheta;
     }
 
     public void nullBullet(int site) {
@@ -491,14 +507,14 @@ public class GameData {
             float dy = y - getY();
 
             canvas.save();
-            canvas.translate(dx,dy);
+            canvas.translate(dx, dy);
             canvas.rotate(theta);
             canvas.drawPicture(tank.getBasePicture(), new RectF(
                     -interval / 2, -interval / 2,
                     interval / 2, interval / 2));
             canvas.restore();
             canvas.save();
-            canvas.translate(dx,dy);
+            canvas.translate(dx, dy);
             canvas.rotate(gunTheta);
             canvas.drawPicture(tank.getGunPicture(), new RectF(
                     -interval / 2, -interval / 2,
@@ -506,7 +522,7 @@ public class GameData {
             canvas.restore();
         }
 
-        public void set(float x,float y, float theta) {
+        public void set(float x, float y, float theta) {
             this.x += x;
             this.y += y;
             box.set(x, y);
@@ -514,7 +530,7 @@ public class GameData {
             box.theta = theta;
         }
 
-        public void set(float x,float y) {
+        public void set(float x, float y) {
             this.x = x;
             this.y = y;
             box.set(x, y);

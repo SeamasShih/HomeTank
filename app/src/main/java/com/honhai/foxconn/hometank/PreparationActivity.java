@@ -31,7 +31,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
 
     private void setListener() {
         button.setOnClickListener(v -> {
-            udpTankClient.sendMessage(UdpSerCliConstant.C_READY + gameData.getMyOrder() + 0);
+            udpTankClient.sendMessage(UdpSerCliConstant.C_READY + gameData.getMyOrder() + 1);
             button.setClickable(false);
         });
     }
