@@ -72,8 +72,9 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         try {
             mCanvas = mSurfaceHolder.lockCanvas();
             mCanvas.translate(mWidth/2,mHeight/2);
-            mCanvas.drawColor(Color.WHITE);
+            mCanvas.drawColor(Color.BLACK);
 
+//            mCanvas.scale(.3f,.3f);
             gameData.drawMap(mCanvas);
             gameData.drawTank(mCanvas);
             gameData.drawBullet(mCanvas);

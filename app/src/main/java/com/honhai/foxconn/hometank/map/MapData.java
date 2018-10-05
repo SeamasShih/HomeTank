@@ -3,7 +3,9 @@ package com.honhai.foxconn.hometank.map;
 public enum MapData {
 
     TEST_ROAD,
-    TEST_PILLAR,
+    BRICK,
+
+    SAND,
 
     ROAD_END_TOP,
     ROAD_END_RIGHT,
@@ -45,5 +47,27 @@ public enum MapData {
     RIVER_SEA_NT,
     RIVER_SEA_NR,
     RIVER_SEA_ND,
-    RIVER_SEA_NL
+    RIVER_SEA_NL,
+    RIVER_SEA_NTL,
+    RIVER_SEA_NTR,
+    RIVER_SEA_NDL,
+    RIVER_SEA_NDR,
+    RIVER_SEA_DLTR,
+    RIVER_SEA_DRTL,
+    RIVER_SEA_NDbutD,
+    RIVER_SEA_NLbutL,
+    RIVER_SEA_NTbutT,
+    RIVER_SEA_NRbutR,
+    RIVER_SEA_TLbutDR,
+    RIVER_SEA_TRbutDL,
+    RIVER_SEA_DLbutTR,
+    RIVER_SEA_DRbutTL,
+    RIVER_SEA_DRbutT,
+    RIVER_SEA_DRbutL,
+    RIVER_SEA_DLbutR,
+    RIVER_SEA_DLbutT,
+    RIVER_SEA_TRbutL,
+    RIVER_SEA_TRbutD,
+    RIVER_SEA_TLbutR,
+    RIVER_SEA_TLbutD
 }
