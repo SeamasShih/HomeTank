@@ -9,9 +9,12 @@ import android.graphics.Picture;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
+import com.honhai.foxconn.hometank.GameActivity;
 import com.honhai.foxconn.hometank.collision.Box;
 import com.honhai.foxconn.hometank.collision.BoxSet;
+import com.honhai.foxconn.hometank.collision.CircleBox;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.BulletPicture;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeavyTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeightTank;
@@ -44,6 +47,7 @@ public class GameData {
     private int mapW = 27;
     private int mapH = 19;
     private int roadNum = mapW*mapH/3;
+    private GameActivity activity;
 
     public int getMyType() {
         return getMySelf().type;
@@ -60,6 +64,11 @@ public class GameData {
 //        createPlayers(1);
 //        myOrder = 0;
 //        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
+//        getMySelf().setType(2);
+    }
+
+    public void setActivity(GameActivity activity) {
+        this.activity = activity;
     }
 
     public void setMapData(MapData[][] data){
@@ -791,13 +800,27 @@ public class GameData {
         while (bullets[bulletSite] != null) {
             bulletSite = (bulletSite + 1) % bullets.length;
         }
-        float[] f = new float[]{interval / 2 * 1.414f, 0};
-        Matrix matrix = new Matrix();
-        matrix.setRotate(player.gunTheta);
-        matrix.mapPoints(f);
+        if (player.type == 2){
+            float[] f = new float[]{interval / 2 * 1.414f, 0};
+            Matrix matrix = new Matrix();
+            matrix.setRotate(player.gunTheta);
+            matrix.mapPoints(f);
 
-        bullets[bulletSite] = new Bullet(player.type, player.x + f[0], player.y + f[1],
-                System.currentTimeMillis(), player.gunTheta, bulletSite);
+            float[] a = new float[]{(2 + (player.getGunLength()-30)*5/70)*interval,0};
+            matrix.mapPoints(a);
+
+            bullets[bulletSite] = new Bullet(player.type, player.x + f[0], player.y + f[1],
+                    System.currentTimeMillis(), player.x + a[0] , player.y + a[1], player.gunTheta , bulletSite);
+        }else {
+            float[] f = new float[]{interval / 2 * 1.414f, 0};
+            Matrix matrix = new Matrix();
+            matrix.setRotate(player.gunTheta);
+            matrix.mapPoints(f);
+
+            bullets[bulletSite] = new Bullet(player.type, player.x + f[0], player.y + f[1],
+                    System.currentTimeMillis(), player.gunTheta, bulletSite);
+        }
+
     }
 
     public void addBullet(int playerType, float x, float y, long it, float gunTheta) {
@@ -877,9 +900,31 @@ public class GameData {
         public long it;
         public long at;
         public long speed = 1000;
+        public long heightSpeed = 1500;
         public float distance;
         private boolean go = true;
         public Box box = new Box(bulletL / 4, bulletL);
+
+        public Bullet(int type, float ix, float iy, long it, float ax , float ay,float theta ,  int site){
+            this.type = type;
+            this.ix = ix;
+            this.iy = iy;
+            switch (type) {
+                case 0:
+                    distance = interval * 3;
+                    break;
+                case 1:
+                    distance = interval * 4;
+                    break;
+            }
+            this.ax = ax;
+            this.ay = ay;
+            this.it = it;
+            this.at = it + heightSpeed;
+            this.site = site;
+            this.box.theta = theta;
+            this.start();
+        }
 
         public Bullet(int type, float ix, float iy, long it, float theta, int site) {
             box.theta = theta;
@@ -909,19 +954,43 @@ public class GameData {
         @Override
         public void run() {
             super.run();
-            long ct = System.currentTimeMillis();
-            while (go && ct <= at) {
-                float r = ((float) (at - ct)) / ((float) speed);
-                x = r * ix + (1 - r) * ax;
-                y = r * iy + (1 - r) * ay;
-                box.set(x, y);
-                if (boxSet.checkBulletCollision(box)) {
-                    go = false;
-                }
-                ct = System.currentTimeMillis();
+            long ct;
+            switch (type){
+                case 0:
+                case 1:
+                    ct = System.currentTimeMillis();
+                    while (go && ct <= at) {
+                        float r = ((float) (at - ct)) / ((float) speed);
+                        x = r * ix + (1 - r) * ax;
+                        y = r * iy + (1 - r) * ay;
+                        box.set(x, y);
+                        if (boxSet.checkBulletCollision(box)) {
+                            go = false;
+                        }
+                        ct = System.currentTimeMillis();
+                    }
+                    if (getMyBox().checkCircleCollision(new CircleBox(x,y,boomL)))
+                        getMySelf().beHurt(type == 0 ? 20 : 50);
+                    addBoom(x, y);
+                    nullBullet(site);
+                    break;
+                case 2:
+                    ct = System.currentTimeMillis();
+                    while (go && ct <= at) {
+                        float r = ((float) (at - ct)) / ((float) heightSpeed);
+                        x = r * ix + (1 - r) * ax;
+                        y = r * iy + (1 - r) * ay;
+                        box.set(x, y);
+
+                        ct = System.currentTimeMillis();
+                    }
+                    if (getMyBox().checkCircleCollision(new CircleBox(x,y,boomL)))
+                        getMySelf().beHurt(30);
+                    addBoom(x, y);
+                    nullBullet(site);
+                    break;
+
             }
-            addBoom(x, y);
-            nullBullet(site);
         }
     }
 
@@ -936,6 +1005,8 @@ public class GameData {
         public int type = 1;
         public float gunLength = 100;
         public TankPrototype tank = new HeavyTank();
+        public int life = 100;
+        public boolean isAlive = true;
         Paint paint = new Paint();
         Paint gunPaint = new Paint();
         Matrix matrix = new Matrix();
@@ -945,6 +1016,19 @@ public class GameData {
             paint.setColor(Color.argb(80,255,0,0));
             gunPaint.setAntiAlias(true);
             gunPaint.setColor(Color.rgb(0x20,0x6b,0x20));
+        }
+
+        public void beHurt(int damage){
+            life -= damage;
+            if (life <= 0) {
+                isAlive = false;
+                life = 0;
+            }
+            activity.setLife(life);
+        }
+
+        public float getGunLength() {
+            return gunLength;
         }
 
         public void gunRight(){
@@ -1055,7 +1139,7 @@ public class GameData {
                 canvas.drawRect(-interval / 2*.02f, -interval / 2 * gunLength/100,
                         interval / 2 *.02f, 0,gunPaint);
                 float l = (2 + (gunLength-30)*5/70)*interval;
-                canvas.drawCircle(0,-l,50,paint);
+                canvas.drawCircle(0,-l,boomL,paint);
             }
             canvas.restore();
         }

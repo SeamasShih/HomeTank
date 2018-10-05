@@ -57,6 +57,11 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         gameData.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.boom));
         setAnimation();
         setClientInfo();
+        gameData.setActivity(this);
+    }
+
+    public void setLife(int life){
+        lifeBarView.setLife(life);
     }
 
     private void setAnimation() {
@@ -172,7 +177,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             else {
                 if (bulletAmount > 0 && !bulletCD.isRunning()) {
                     gameData.addBullet(gameData.getMySelf());
-                    tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo());
+//                    tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo());
                     bulletAmount--;
                     bulletAmountView.setAmount(bulletAmount);
                     bulletCD.start();
