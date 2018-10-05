@@ -8,22 +8,30 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.honhai.foxconn.hometank.gameplay.GameData;
+import com.honhai.foxconn.hometank.map.MapData;
+import com.honhai.foxconn.hometank.network.TcpReceiveListener;
+import com.honhai.foxconn.hometank.network.TcpSerCliConstant;
+import com.honhai.foxconn.hometank.network.TcpTankClient;
 import com.honhai.foxconn.hometank.network.UdpReceiveListener;
 import com.honhai.foxconn.hometank.network.UdpSerCliConstant;
 import com.honhai.foxconn.hometank.network.UdpTankClient;
 
-public class PreparationActivity extends AppCompatActivity implements UdpReceiveListener {
+import java.util.StringTokenizer;
 
+public class PreparationActivity extends AppCompatActivity implements UdpReceiveListener, TcpReceiveListener {
+
+    private final String TAG = "PreparationActivity";
     private Button button;
     private TextView textView;
     private GameData gameData = GameData.getInstance();
-    private UdpTankClient udpTankClient;
+    private UdpTankClient udpTankClient = UdpTankClient.getClient(this);
+    private TcpTankClient tcpTankClient = TcpTankClient.getClient(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.preparation_layout);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         findViews();
         setListener();
         setTankClient();
@@ -42,8 +50,8 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
     }
 
     private void setTankClient() {
-        udpTankClient = UdpTankClient.getClient(this);
         udpTankClient.sendMessage(UdpSerCliConstant.C_REGISTER);
+        tcpTankClient.sendMessage(TcpSerCliConstant.C_MAP);
     }
 
     @Override
@@ -61,8 +69,32 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
                     Character.getNumericValue(message.charAt(UdpSerCliConstant.S_START_GAME.length())));
 
             Intent intent = new Intent();
-            intent.setClass(this,GameActivity.class);
+            intent.setClass(this, GameActivity.class);
             startActivity(intent);
         }
+    }
+
+    @Override
+    public void onTcpMessageReceive(String message) {
+        StringTokenizer tokenizer = new StringTokenizer(message, " ");
+        int w = Integer.valueOf(tokenizer.nextToken().substring(1));
+        int h = Integer.valueOf(tokenizer.nextToken().substring(1));
+        MapData[][] mapData = new MapData[w][h];
+
+        int indexW = -1;
+        int indexH = 0;
+        while (tokenizer.hasMoreTokens()) {
+            String s = tokenizer.nextToken();
+
+            if (s.equals("l")) {
+                indexW++;
+                indexH = 0;
+            } else {
+                mapData[indexW][indexH] = MapData.values()[Integer.valueOf(s)];
+                indexH++;
+            }
+        }
+
+        gameData.setMapData(mapData);
     }
 }

@@ -55,12 +55,18 @@ public class GameData {
         PASS
     }
 
-
     private GameData() {
         initialMap();
         createPlayers(1);
         myOrder = 0;
         getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
+    }
+
+    public void setMapData(MapData[][] data){
+        this.mapData = data;
+
+        boxSet.setMapBox(mapData, interval);
+        map = MapPicture.createMap(mapData, interval);
     }
 
     private void initialMap() {
