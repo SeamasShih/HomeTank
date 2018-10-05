@@ -56,10 +56,10 @@ public class GameData {
     }
 
     private GameData() {
-        initialMap();
-        createPlayers(1);
-        myOrder = 0;
-        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
+//        initialMap();
+//        createPlayers(1);
+//        myOrder = 0;
+//        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
     }
 
     public void setMapData(MapData[][] data){
@@ -927,15 +927,15 @@ public class GameData {
 
     private class Player {
 
-        public Box box = new Box(interval * .6f, interval * .4f);
+        public Box box = new Box(interval * .8f, interval * .6f);
         public float x;
         public float y;
         public float theta = 0;
         public float gunTheta = 0;
-        public long speed = 8;
-        public int type = 2;
+        public long speed = 10;
+        public int type = 1;
         public float gunLength = 100;
-        public TankPrototype tank = new HeightTank();
+        public TankPrototype tank = new HeavyTank();
         Paint paint = new Paint();
         Paint gunPaint = new Paint();
         Matrix matrix = new Matrix();
