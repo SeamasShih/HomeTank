@@ -50,10 +50,10 @@ public class GameData {
 
 
     private GameData() {
-        initialMap();
-        createPlayers(1);
-        myOrder = 0;
-        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
+//        initialMap();
+//        createPlayers(1);
+//        myOrder = 0;
+//        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
     }
 
     private void initialMap() {
