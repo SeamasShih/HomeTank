@@ -74,6 +74,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void achieveZoomRate(){
+        if (!gameData.amIAlive()){
+            zoomRate = .7f;
+            return;
+        }
         switch (gameData.getMyType()){
             case 0:
             case 1:
@@ -86,10 +90,6 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     public void setZoomRateByType(int type){
-        if (gameData.amIAlive()){
-            zoomRate = .7f;
-            return;
-        }
         switch (type){
             case 0:
             case 1:
