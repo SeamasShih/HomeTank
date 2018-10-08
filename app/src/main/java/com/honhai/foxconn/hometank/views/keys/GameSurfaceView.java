@@ -18,6 +18,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private Canvas mCanvas;
     private boolean mIsDrawing;
     private int mWidth , mHeight;
+    private float zoomRate = 1f;
     private Paint fogPaint = new Paint();
     private Path fog;
     private GameData gameData = GameData.getInstance();
@@ -68,18 +69,25 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
+    public void setZoomRate(float zoomRate) {
+        this.zoomRate = zoomRate;
+    }
+
     private void drawSomething() {
         try {
             mCanvas = mSurfaceHolder.lockCanvas();
             mCanvas.translate(mWidth/2,mHeight/2);
             mCanvas.drawColor(Color.BLACK);
 
-//            mCanvas.scale(.3f,.3f);
+            mCanvas.save();
+//            mCanvas.scale(5f/9,5f/9);
+//            mCanvas.scale(.9f,.9f);
             gameData.drawMap(mCanvas);
             gameData.drawTank(mCanvas);
             gameData.drawBullet(mCanvas);
             gameData.drawBoom(mCanvas);
 
+            mCanvas.restore();
             mCanvas.drawPath(fog,fogPaint);
         }catch (Exception e){
             e.printStackTrace();
