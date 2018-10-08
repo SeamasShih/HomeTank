@@ -828,6 +828,22 @@ public class GameData {
 
     }
 
+    public void addBullet(int playerType, float x, float y, long it, float gunLength , float gunTheta) {
+        while (bullets[bulletSite] != null) {
+            bulletSite = (bulletSite + 1) % bullets.length;
+        }
+        float[] f = new float[]{interval / 2 * 1.414f, 0};
+        Matrix matrix = new Matrix();
+        matrix.setRotate(gunTheta);
+        matrix.mapPoints(f);
+
+        float[] a = new float[]{(2 + (gunLength-30)*5/70)*interval,0};
+        matrix.mapPoints(a);
+
+        bullets[bulletSite] = new Bullet(playerType, x + f[0], y + f[1],
+                it, x + a[0] , y + a[1], gunTheta , bulletSite);
+    }
+
     public void addBullet(int playerType, float x, float y, long it, float gunTheta) {
         while (bullets[bulletSite] != null) {
             bulletSite = (bulletSite + 1) % bullets.length;
