@@ -18,6 +18,7 @@ import com.honhai.foxconn.hometank.collision.CircleBox;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.BulletPicture;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeavyTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeightTank;
+import com.honhai.foxconn.hometank.gameplay.tankdrawable.LightTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.TankPrototype;
 import com.honhai.foxconn.hometank.map.MapData;
 import com.honhai.foxconn.hometank.map.MapFunction;
@@ -64,7 +65,7 @@ public class GameData {
 //        createPlayers(1);
 //        myOrder = 0;
 //        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
-//        getMySelf().setType(2);
+//        getMySelf().setType(1);
     }
 
     public void setActivity(GameActivity activity) {
@@ -1045,15 +1046,21 @@ public class GameData {
             this.type = type;
             switch (type){
                 case 0:
+                    tank = new LightTank();
+                    box = new Box(interval * .6f, interval * .5f);
+                    box.set(x,y);
+                    speed = 6;
                     break;
                 case 1:
                     tank = new HeavyTank();
                     box = new Box(interval * .8f, interval * .6f);
+                    box.set(x,y);
                     speed = 10;
                     break;
                 case 2:
                     tank = new HeightTank();
                     box = new Box(interval * .6f, interval * .4f);
+                    box.set(x,y);
                     speed = 8;
                     break;
             }

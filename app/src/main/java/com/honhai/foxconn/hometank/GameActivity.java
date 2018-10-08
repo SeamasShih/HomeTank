@@ -20,6 +20,7 @@ import com.honhai.foxconn.hometank.network.UdpReceiveListener;
 import com.honhai.foxconn.hometank.network.UdpSerCliConstant;
 import com.honhai.foxconn.hometank.network.UdpTankClient;
 import com.honhai.foxconn.hometank.views.keys.FireKey;
+import com.honhai.foxconn.hometank.views.keys.GameSurfaceView;
 import com.honhai.foxconn.hometank.views.plate.BulletAmountView;
 import com.honhai.foxconn.hometank.views.plate.LifeBarView;
 
@@ -32,6 +33,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private LifeBarView lifeBarView;
     private BulletAmountView bulletAmountView;
     private FireKey fire;
+    private GameSurfaceView surface;
     private boolean goUp = false;
     private boolean goDown = false;
     private boolean goLeft = false;
@@ -400,6 +402,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         fire = findViewById(R.id.fireKey);
         bulletAmountView = findViewById(R.id.bulletAmount);
         lifeBarView = findViewById(R.id.lifeBar);
+        surface = findViewById(R.id.surface);
     }
 
     @Override
