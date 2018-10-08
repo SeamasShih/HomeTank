@@ -69,6 +69,18 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
+    private void achieveZoomRate(){
+        switch (gameData.getMyType()){
+            case 0:
+            case 1:
+                zoomRate = .9f;
+                break;
+            case 2:
+                zoomRate = 5f/9f;
+                break;
+        }
+    }
+
     public void setZoomRateByType(int type){
         switch (type){
             case 0:
@@ -92,6 +104,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             mCanvas.drawColor(Color.BLACK);
 
             mCanvas.save();
+            achieveZoomRate();
             mCanvas.scale(zoomRate,zoomRate);
             gameData.drawMap(mCanvas);
             gameData.drawTank(mCanvas);
