@@ -65,7 +65,7 @@ public class GameData {
 //        createPlayers(1);
 //        myOrder = 0;
 //        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
-//        getMySelf().setType(1);
+//        getMySelf().setType(2);
     }
 
     public void setActivity(GameActivity activity) {
@@ -769,6 +769,8 @@ public class GameData {
         Arrays.stream(players).forEach(player -> {
             player.draw(canvas);
         });
+        if (getMySelf().type == 2)
+            getMySelf().drawPrediction(canvas);
     }
 
     public void drawBullet(Canvas canvas) {
@@ -1154,11 +1156,17 @@ public class GameData {
                     interval / 2, interval / 2));
             if (type == 2) {
                 canvas.rotate(90);
-                canvas.drawRect(-interval / 2 * .02f, -interval / 2 * gunLength / 100,
-                        interval / 2 * .02f, 0, gunPaint);
-                float l = (2 + (gunLength - 30) * 5 / 70) * interval;
-                canvas.drawCircle(0, -l, boomL, paint);
+                canvas.drawRect(-interval / 2*.02f, -interval / 2 * gunLength/100,
+                        interval / 2 *.02f, 0,gunPaint);
             }
+            canvas.restore();
+        }
+
+        public void drawPrediction(Canvas canvas){
+            canvas.save();
+            canvas.rotate(90+gunTheta);
+            float l = (2 + (gunLength-30)*5/70)*interval;
+            canvas.drawCircle(0,-l,boomL,paint);
             canvas.restore();
         }
 
