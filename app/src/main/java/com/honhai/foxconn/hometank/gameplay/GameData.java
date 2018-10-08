@@ -646,6 +646,10 @@ public class GameData {
         getPlayer(order).set(theta);
     }
 
+    public void setPlayerAlive(int order , boolean isAlive){
+        getPlayer(order).isAlive = isAlive;
+    }
+
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
     }
