@@ -622,7 +622,11 @@ public class GameData {
         return players.length;
     }
 
-    public void setPlayerTankType(int type) {
+    public void setPlayerTankType(int order , int type) {
+        getPlayer(order).type = type;
+    }
+
+    public void setMyTankType(int type) {
         getMySelf().type = type;
     }
 
