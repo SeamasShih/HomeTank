@@ -80,8 +80,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             mCanvas.drawColor(Color.BLACK);
 
             mCanvas.save();
-//            mCanvas.scale(5f/9,5f/9);
-//            mCanvas.scale(.9f,.9f);
+            mCanvas.scale(zoomRate,zoomRate);
             gameData.drawMap(mCanvas);
             gameData.drawTank(mCanvas);
             gameData.drawBullet(mCanvas);
