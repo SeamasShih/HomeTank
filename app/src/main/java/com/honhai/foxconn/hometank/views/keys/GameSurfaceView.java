@@ -69,6 +69,18 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
+    public void setZoomRateByType(int type){
+        switch (type){
+            case 0:
+            case 1:
+                zoomRate = .9f;
+                break;
+            case 2:
+                zoomRate = 5f/9f;
+                break;
+        }
+    }
+
     public void setZoomRate(float zoomRate) {
         this.zoomRate = zoomRate;
     }
