@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
 
     private final String TAG = "PreparationActivity";
     private Button button;
+    private View light , heavy , height;
     private TextView textView;
     private GameData gameData = GameData.getInstance();
     private UdpTankClient udpTankClient = UdpTankClient.getClient(this);
@@ -47,11 +49,29 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
             tcpTankClient.sendMessage(TcpSerCliConstant.C_PLAYER_SITE);
             button.setClickable(false);
         });
+        light.setOnClickListener(v -> {
+            v.setBackgroundResource(R.drawable.choice_background);
+            heavy.setBackground(null);
+            height.setBackground(null);
+        });
+        heavy.setOnClickListener(v -> {
+            v.setBackgroundResource(R.drawable.choice_background);
+            light.setBackground(null);
+            height.setBackground(null);
+        });
+        height.setOnClickListener(v -> {
+            v.setBackgroundResource(R.drawable.choice_background);
+            heavy.setBackground(null);
+            light.setBackground(null);
+        });
     }
 
     private void findViews() {
         button = findViewById(R.id.battle);
         textView = findViewById(R.id.textPlayerAmount);
+        light = findViewById(R.id.lightTank);
+        heavy = findViewById(R.id.heavyTank);
+        height = findViewById(R.id.heightTank);
     }
 
     private void setTankClient() {
