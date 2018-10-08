@@ -32,6 +32,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
     private UdpTankClient udpTankClient = UdpTankClient.getClient(this);
     private TcpTankClient tcpTankClient = TcpTankClient.getClient(this);
     private List<int[]> tempSiteList = new ArrayList<>();
+    private int tankType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
 
     private void setListener() {
         button.setOnClickListener(v -> {
-            udpTankClient.sendMessage(UdpSerCliConstant.C_READY + gameData.getMyOrder() + 1);
+            udpTankClient.sendMessage(UdpSerCliConstant.C_READY + gameData.getMyOrder() + tankType);
             tcpTankClient.sendMessage(TcpSerCliConstant.C_PLAYER_SITE);
             button.setClickable(false);
         });
@@ -53,16 +54,19 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
             v.setBackgroundResource(R.drawable.choice_background);
             heavy.setBackground(null);
             height.setBackground(null);
+            tankType = 0;
         });
         heavy.setOnClickListener(v -> {
             v.setBackgroundResource(R.drawable.choice_background);
             light.setBackground(null);
             height.setBackground(null);
+            tankType = 1;
         });
         height.setOnClickListener(v -> {
             v.setBackgroundResource(R.drawable.choice_background);
             heavy.setBackground(null);
             light.setBackground(null);
+            tankType = 2;
         });
     }
 

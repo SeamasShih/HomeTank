@@ -62,7 +62,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         gameData.setActivity(this);
     }
 
-    public void setLife(int life){
+    public void setLife(int life) {
         lifeBarView.setLife(life);
     }
 
@@ -119,7 +119,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                             try {
                                 gameData.gunLower();
                                 //todo Ian
-                                Thread.sleep(gameData.getMySpeed()*3);
+                                Thread.sleep(gameData.getMySpeed() * 3);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -146,7 +146,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                             try {
                                 gameData.gunRaise();
                                 //todo Ian
-                                Thread.sleep(gameData.getMySpeed()*3);
+                                Thread.sleep(gameData.getMySpeed() * 3);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -165,27 +165,14 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
 
     private void setFireListener() {
         fire.setOnClickListener(v -> {
-            if (gameData.getMyType() == 2){
-                if (bulletAmount > 0 && !bulletCD.isRunning()) {
-                    gameData.addBullet(gameData.getMySelf());
-                    //todo Ian
-                    bulletAmount--;
-                    bulletAmountView.setAmount(bulletAmount);
-                    bulletCD.start();
-                    if (!bulletAdd.isRunning())
-                        bulletAdd.start();
-                }
-            }
-            else {
-                if (bulletAmount > 0 && !bulletCD.isRunning()) {
-                    gameData.addBullet(gameData.getMySelf());
-//                    tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo());
-                    bulletAmount--;
-                    bulletAmountView.setAmount(bulletAmount);
-                    bulletCD.start();
-                    if (!bulletAdd.isRunning())
-                        bulletAdd.start();
-                }
+            if (bulletAmount > 0 && !bulletCD.isRunning()) {
+                gameData.addBullet(gameData.getMySelf());
+                tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo(gameData.getMyType()));
+                bulletAmount--;
+                bulletAmountView.setAmount(bulletAmount);
+                bulletCD.start();
+                if (!bulletAdd.isRunning())
+                    bulletAdd.start();
             }
         });
     }
@@ -413,10 +400,18 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             int order = Character.getNumericValue(tokenizer.nextToken().charAt(TcpSerCliConstant.C_FIRE.length()));
             if (gameData.getMyOrder() != order) {
                 int playerType = Integer.valueOf(tokenizer.nextToken());
-                float x = Float.valueOf(tokenizer.nextToken());
-                float y = Float.valueOf(tokenizer.nextToken());
-                float gunTheta = Float.valueOf(tokenizer.nextToken());
-                gameData.addBullet(playerType, x, y, System.currentTimeMillis(), gunTheta);
+                if (playerType == 2) {
+                    float x = Float.valueOf(tokenizer.nextToken());
+                    float y = Float.valueOf(tokenizer.nextToken());
+                    float gunLength = Float.valueOf(tokenizer.nextToken());
+                    float gunTheta = Float.valueOf(tokenizer.nextToken());
+                    gameData.addBullet(playerType, x, y, System.currentTimeMillis(), gunLength, gunTheta);
+                }else {
+                    float x = Float.valueOf(tokenizer.nextToken());
+                    float y = Float.valueOf(tokenizer.nextToken());
+                    float gunTheta = Float.valueOf(tokenizer.nextToken());
+                    gameData.addBullet(playerType, x, y, System.currentTimeMillis(), gunTheta);
+                }
             }
         }
     }
@@ -425,8 +420,13 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     public void onUdpMessageReceive(String message) {
         if (message.startsWith(UdpSerCliConstant.C_INITIAL_TANK_DATA)) {
             for (int i = 0; i < gameData.getPlayerAmount(); i++) {
-                int tank = Character.getNumericValue(message.charAt(UdpSerCliConstant.C_INITIAL_TANK_DATA.length() + i));
-                gameData.setPlayerTankType(tank);
+                int tankType;
+
+                for (int order = 0; order < message.length() - UdpSerCliConstant.C_INITIAL_TANK_DATA.length(); order++) {
+                    tankType = Character.getNumericValue(message.charAt(UdpSerCliConstant.C_INITIAL_TANK_DATA.length() + order));
+                    gameData.setPlayerTankType(order, tankType);
+                }
+                surface.setZoomRateByType(gameData.getMyType());
             }
         } else if (message.startsWith(UdpSerCliConstant.C_TANK_SITE)) {
             StringTokenizer tokenizer = new StringTokenizer(message, " ");
