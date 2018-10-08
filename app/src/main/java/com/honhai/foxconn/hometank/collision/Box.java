@@ -179,4 +179,58 @@ public class Box {
                 p[1] < rightBottom.y;
     }
 
+    public boolean contain(float[] b1 , float[] b2){
+        return pointContain(b1[0] , b1[1] , b1[6] , b1[7] , b2[0] , b2[1]) ||
+                pointContain(b1[0] , b1[1] , b1[6] , b1[7] , b2[2] , b2[3]) ||
+                pointContain(b1[0] , b1[1] , b1[6] , b1[7] , b2[4] , b2[5]) ||
+                pointContain(b1[0] , b1[1] , b1[6] , b1[7] , b2[6] , b2[7]);
+    }
+
+    public boolean pointContain(float l , float t , float r , float b , float x , float y){
+        return (x >= l) && (x <= r) && (y >= t) && (y <= b);
+    }
+
+    public boolean isCollision(Box box2){
+        Matrix matrix1 = new Matrix();
+        Matrix matrix2 = new Matrix();
+        Matrix matrixF1 = new Matrix();
+        Matrix matrixF2 = new Matrix();
+
+        matrix1.setRotate(this.theta,this.centre.x,this.centre.y);
+        matrix2.setRotate(box2.theta,box2.centre.x,box2.centre.y);
+        matrixF1.setRotate(-this.theta);
+        matrixF2.setRotate(-box2.theta);
+        float[] p1 = new float[]{
+                this.leftTop.x,
+                this.leftTop.y,
+                this.rightTop.x,
+                this.rightTop.y,
+                this.leftBottom.x,
+                this.leftBottom.y,
+                this.rightBottom.x,
+                this.rightBottom.y
+        };
+        float[] p2 = new float[]{
+                box2.leftTop.x,
+                box2.leftTop.y,
+                box2.rightTop.x,
+                box2.rightTop.y,
+                box2.leftBottom.x,
+                box2.leftBottom.y,
+                box2.rightBottom.x,
+                box2.rightBottom.y
+        };
+        matrix1.mapPoints(p1);
+        matrix2.mapPoints(p2);
+        float[] pF1 = new float[8];
+        float[] pF2 = new float[8];
+        matrixF1.mapPoints(pF1,p1);
+        matrixF1.mapPoints(pF2,p2);
+        if (contain(pF1,pF2))
+            return true;
+        matrixF2.mapPoints(pF1,p1);
+        matrixF2.mapPoints(pF2,p2);
+        return contain(pF2,pF1);
+    }
+
 }

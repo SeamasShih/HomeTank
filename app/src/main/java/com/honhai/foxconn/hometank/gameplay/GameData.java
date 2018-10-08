@@ -981,6 +981,11 @@ public class GameData {
                         if (boxSet.checkBulletCollision(box)) {
                             go = false;
                         }
+                        for (int i = 0 ; i < players.length ; i++){
+                            if (i == myOrder) continue;
+                            if (getMyBox().isCollision(players[i].box))
+                                go = false;
+                        }
                         ct = System.currentTimeMillis();
                     }
                     if (getMyBox().checkCircleCollision(new CircleBox(x, y, boomL)))
