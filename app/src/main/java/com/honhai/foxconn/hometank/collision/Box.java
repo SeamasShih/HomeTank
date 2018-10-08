@@ -24,6 +24,37 @@ public class Box {
         this.height = height;
     }
 
+    public boolean checkCircleCollision(CircleBox box){
+        Matrix matrix = new Matrix();
+        matrix.setRotate(-theta,centre.x,centre.y);
+        float[] lt = new float[]{leftTop.x,leftTop.y};
+        float[] rb = new float[]{rightBottom.x,rightBottom.y};
+        float[] c = new float[]{box.x,box.y};
+        matrix.mapPoints(lt);
+        matrix.mapPoints(rb);
+        matrix.mapPoints(c);
+        if (c[0] < lt[0]){
+            if (c[1] < lt[1])
+                return box.contain(lt);
+            else if (c[1] > rb[1])
+                return box.contain(lt[0],rb[1]);
+            else
+                return Math.abs(c[0] - lt[0]) <= box.radius;
+        }else if (c[0] > rb[0]){
+            if (c[1] < lt[1])
+                return box.contain(rb[0], lt[1]);
+            else if (c[1] > rb[1])
+                return box.contain(rb);
+            else
+                return Math.abs(c[0] - rb[0]) <= box.radius;
+
+        }else if (c[1] < lt[1])
+            return Math.abs(c[1] - lt[1]) <= box.radius;
+        else if (c[1] > rb[1])
+            return Math.abs(c[1] - rb[1]) <= box.radius;
+        return true;
+    }
+
     public void offset(float x , float y){
         leftTop.offset(x, y);
         rightTop.offset(x, y);
