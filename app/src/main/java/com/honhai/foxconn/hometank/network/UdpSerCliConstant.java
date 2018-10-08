@@ -2,7 +2,7 @@ package com.honhai.foxconn.hometank.network;
 
 public class UdpSerCliConstant {
 
-    final static String SERVER_IP = "192.168.1.45";
+    final static String SERVER_IP = "192.168.1.82";
     final static int PORT = 9487;
 
     public final static String C_REGISTER = "cregister";

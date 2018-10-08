@@ -30,8 +30,6 @@ public class Box {
         float[] lt = new float[]{leftTop.x,leftTop.y};
         float[] rb = new float[]{rightBottom.x,rightBottom.y};
         float[] c = new float[]{box.x,box.y};
-        matrix.mapPoints(lt);
-        matrix.mapPoints(rb);
         matrix.mapPoints(c);
         if (c[0] < lt[0]){
             if (c[1] < lt[1])

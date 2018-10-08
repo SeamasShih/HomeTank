@@ -84,6 +84,11 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
     }
 
     @Override
+    public void onBackPressed() {
+
+    }
+
+    @Override
     public void onUdpMessageReceive(String message) {
         if (message.startsWith(UdpSerCliConstant.C_ORDER)) {
             if (gameData.getMyOrder() == -1) {
@@ -99,6 +104,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
 
             tempSiteList.forEach(ints -> gameData.setPlayersSite(ints[0], ints[1], ints[2]));
             Intent intent = new Intent();
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.setClass(this, GameActivity.class);
             startActivity(intent);
         }

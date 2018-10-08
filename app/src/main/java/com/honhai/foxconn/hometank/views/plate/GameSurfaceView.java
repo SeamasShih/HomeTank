@@ -1,4 +1,4 @@
-package com.honhai.foxconn.hometank.views.keys;
+package com.honhai.foxconn.hometank.views.plate;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -54,7 +54,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+        mWidth = getWidth();
+        mHeight = getHeight();
+        fog.reset();
+        fog.addCircle(0,0,mHeight/2, Path.Direction.CCW);
     }
 
     @Override

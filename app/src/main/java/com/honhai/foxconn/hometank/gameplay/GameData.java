@@ -949,7 +949,7 @@ public class GameData {
             matrix.setRotate(theta);
             switch (type) {
                 case 0:
-                    distance = interval * 3;
+                    distance = interval * 2.5f;
                     break;
                 case 1:
                     distance = interval * 4;
@@ -981,10 +981,11 @@ public class GameData {
                         if (boxSet.checkBulletCollision(box)) {
                             go = false;
                         }
-                        for (int i = 0 ; i < players.length ; i++){
-                            if (i == myOrder) continue;
-                            if (getMyBox().isCollision(players[i].box))
+                        for (Player player : players) {
+                            if (box.isCollision(player.box)) {
                                 go = false;
+                                break;
+                            }
                         }
                         ct = System.currentTimeMillis();
                     }
@@ -1003,7 +1004,9 @@ public class GameData {
 
                         ct = System.currentTimeMillis();
                     }
-                    if (getMyBox().checkCircleCollision(new CircleBox(x, y, boomL)))
+                    if (getMyBox().checkCircleCollision(new CircleBox(x, y, boomL/3)))
+                        getMySelf().beHurt(100);
+                    else if (getMyBox().checkCircleCollision(new CircleBox(x, y, boomL)))
                         getMySelf().beHurt(30);
                     addBoom(x, y);
                     nullBullet(site);
@@ -1067,7 +1070,7 @@ public class GameData {
                     tank = new LightTank();
                     box = new Box(interval * .6f, interval * .5f);
                     box.set(x, y);
-                    speed = 6;
+                    speed = 4;
                     break;
                 case 1:
                     tank = new HeavyTank();
@@ -1079,7 +1082,7 @@ public class GameData {
                     tank = new HeightTank();
                     box = new Box(interval * .6f, interval * .4f);
                     box.set(x, y);
-                    speed = 8;
+                    speed = 7;
                     break;
             }
         }

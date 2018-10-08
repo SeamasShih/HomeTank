@@ -6,7 +6,6 @@ import android.animation.ValueAnimator;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,7 +19,7 @@ import com.honhai.foxconn.hometank.network.UdpReceiveListener;
 import com.honhai.foxconn.hometank.network.UdpSerCliConstant;
 import com.honhai.foxconn.hometank.network.UdpTankClient;
 import com.honhai.foxconn.hometank.views.keys.FireKey;
-import com.honhai.foxconn.hometank.views.keys.GameSurfaceView;
+import com.honhai.foxconn.hometank.views.plate.GameSurfaceView;
 import com.honhai.foxconn.hometank.views.plate.BulletAmountView;
 import com.honhai.foxconn.hometank.views.plate.LifeBarView;
 
@@ -60,6 +59,18 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         setAnimation();
         setClientInfo();
         gameData.setActivity(this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus){
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            );
+        }
     }
 
     public void setLife(int life) {
@@ -270,6 +281,11 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         });
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
+
     private void setRightListener() {
         right.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
@@ -425,8 +441,11 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                 for (int order = 0; order < message.length() - UdpSerCliConstant.C_INITIAL_TANK_DATA.length(); order++) {
                     tankType = Character.getNumericValue(message.charAt(UdpSerCliConstant.C_INITIAL_TANK_DATA.length() + order));
                     gameData.setPlayerTankType(order, tankType);
+                    if (gameData.getMyOrder() == order && gameData.getMyType() != 2){
+                        raise.setVisibility(View.INVISIBLE);
+                        lower.setVisibility(View.INVISIBLE);
+                    }
                 }
-                surface.setZoomRateByType(gameData.getMyType());
             }
         } else if (message.startsWith(UdpSerCliConstant.C_TANK_SITE)) {
             StringTokenizer tokenizer = new StringTokenizer(message, " ");
