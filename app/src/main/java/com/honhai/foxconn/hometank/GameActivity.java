@@ -426,7 +426,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         if (message.startsWith(UdpSerCliConstant.C_INITIAL_TANK_DATA)) {
             for (int i = 0; i < gameData.getPlayerAmount(); i++) {
                 int tank = Character.getNumericValue(message.charAt(UdpSerCliConstant.C_INITIAL_TANK_DATA.length() + i));
-                gameData.setPlayerTankType(tank);
+//                gameData.setPlayerTankType(tank);
             }
         } else if (message.startsWith(UdpSerCliConstant.C_TANK_SITE)) {
             StringTokenizer tokenizer = new StringTokenizer(message, " ");
