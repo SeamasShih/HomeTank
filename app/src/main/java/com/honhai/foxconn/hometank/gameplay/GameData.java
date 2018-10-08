@@ -731,6 +731,10 @@ public class GameData {
         booms[boomSite] = new Boom(x, y, boomSite);
     }
 
+    public boolean amIAlive(){
+        return getMySelf().isAlive;
+    }
+
     public void gunRight() {
         getMySelf().gunRight();
     }
@@ -1045,6 +1049,7 @@ public class GameData {
             if (life <= 0) {
                 isAlive = false;
                 life = 0;
+                activity.iAmDead();
             }
             activity.setLife(life);
         }
@@ -1146,6 +1151,7 @@ public class GameData {
         }
 
         public void draw(Canvas canvas) {
+            if (!this.isAlive) return;
             float dx = x - getX();
             float dy = y - getY();
 

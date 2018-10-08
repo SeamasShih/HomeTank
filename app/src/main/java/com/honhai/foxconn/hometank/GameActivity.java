@@ -19,6 +19,8 @@ import com.honhai.foxconn.hometank.network.UdpReceiveListener;
 import com.honhai.foxconn.hometank.network.UdpSerCliConstant;
 import com.honhai.foxconn.hometank.network.UdpTankClient;
 import com.honhai.foxconn.hometank.views.keys.FireKey;
+import com.honhai.foxconn.hometank.views.keys.TurnLeftKey;
+import com.honhai.foxconn.hometank.views.keys.TurnRightKey;
 import com.honhai.foxconn.hometank.views.plate.GameSurfaceView;
 import com.honhai.foxconn.hometank.views.plate.BulletAmountView;
 import com.honhai.foxconn.hometank.views.plate.LifeBarView;
@@ -28,7 +30,9 @@ import java.util.StringTokenizer;
 public class GameActivity extends AppCompatActivity implements UdpReceiveListener, TcpReceiveListener {
     private final String TAG = "GameActivity";
     private GameData gameData = GameData.getInstance();
-    private View up, down, left, right, raise, lower, gunLeft, gunRight;
+    private View up, down, raise, lower, gunLeft, gunRight;
+    private TurnRightKey left;
+    private TurnLeftKey right;
     private LifeBarView lifeBarView;
     private BulletAmountView bulletAmountView;
     private FireKey fire;
@@ -59,6 +63,124 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         setAnimation();
         setClientInfo();
         gameData.setActivity(this);
+    }
+
+    public void iAmDead(){
+        raise.setVisibility(View.INVISIBLE);
+        lower.setVisibility(View.INVISIBLE);
+        fire.setVisibility(View.INVISIBLE);
+        gunLeft.setVisibility(View.INVISIBLE);
+        gunRight.setVisibility(View.INVISIBLE);
+        setDeadUpListener();
+        setDeadDownListener();
+        setDeadLeftListener();
+        setDeadRightListener();
+        right.setDeadMode(true);
+        left.setDeadMode(true);
+    }
+
+    private void setDeadRightListener() {
+        right.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    goRight = true;
+                    new Thread(() -> {
+                        while (goRight) {
+                            try {
+                                surface.moveDeadYRight();
+                                Thread.sleep(7);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    goRight = false;
+                    break;
+            }
+            v.performClick();
+            return true;
+        });
+    }
+
+    private void setDeadLeftListener() {
+        left.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    goLeft = true;
+                    new Thread(() -> {
+                        while (goLeft) {
+                            try {
+                                surface.moveDeadYLeft();
+                                Thread.sleep(7);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    goLeft = false;
+                    break;
+            }
+            v.performClick();
+            return true;
+        });
+    }
+
+    private void setDeadDownListener() {
+        down.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    goDown = true;
+                    new Thread(() -> {
+                        while (goDown) {
+                            try {
+                                surface.moveDeadXDown();
+                                Thread.sleep(7);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    goDown = false;
+                    break;
+            }
+            v.performClick();
+            return true;
+        });
+    }
+
+    private void setDeadUpListener(){
+        up.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    goUp = true;
+                    new Thread(() -> {
+                        while (goUp) {
+                            try {
+                                surface.moveDeadXUp();
+                                Thread.sleep(7);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    goUp = false;
+                    break;
+            }
+            v.performClick();
+            return true;
+        });
     }
 
     @Override

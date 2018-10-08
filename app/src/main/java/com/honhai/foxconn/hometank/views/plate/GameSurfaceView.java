@@ -22,6 +22,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private Paint fogPaint = new Paint();
     private Path fog;
     private GameData gameData = GameData.getInstance();
+    private float deadX , deadY;
 
     public GameSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -85,6 +86,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     public void setZoomRateByType(int type){
+        if (gameData.amIAlive()){
+            zoomRate = .7f;
+            return;
+        }
         switch (type){
             case 0:
             case 1:
@@ -94,6 +99,22 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 zoomRate = 5f/9f;
                 break;
         }
+    }
+
+    public void moveDeadXUp(){
+        deadX--;
+    }
+
+    public void moveDeadXDown(){
+        deadX++;
+    }
+
+    public void moveDeadYLeft(){
+        deadY--;
+    }
+
+    public void moveDeadYRight(){
+        deadY++;
     }
 
     public void setZoomRate(float zoomRate) {
@@ -108,6 +129,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
             mCanvas.save();
             achieveZoomRate();
+            mCanvas.translate(-deadY,-deadX);
             mCanvas.scale(zoomRate,zoomRate);
             gameData.drawMap(mCanvas);
             gameData.drawTank(mCanvas);
