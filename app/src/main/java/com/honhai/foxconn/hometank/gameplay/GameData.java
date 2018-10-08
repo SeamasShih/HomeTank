@@ -9,6 +9,7 @@ import android.graphics.Picture;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.honhai.foxconn.hometank.collision.Box;
 import com.honhai.foxconn.hometank.collision.BoxSet;
