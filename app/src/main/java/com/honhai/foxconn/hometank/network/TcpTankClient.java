@@ -1,5 +1,7 @@
 package com.honhai.foxconn.hometank.network;
 
+import android.util.Log;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,7 +15,7 @@ public class TcpTankClient {
     private static TcpReceiveListener tcpReceiveListener;
     private Socket socket;
     private DataInputStream dataInputStream;
-    private DataOutputStream dataOutputStream;
+    private volatile DataOutputStream dataOutputStream;
 
     private TcpTankClient(String ip, int port) {
         new Thread(() -> {
@@ -40,6 +42,7 @@ public class TcpTankClient {
     public void sendMessage(String message) {
         new Thread(() -> {
             try {
+                while (dataOutputStream == null);
                 dataOutputStream.writeUTF(message);
             } catch (IOException e) {
                 e.printStackTrace();

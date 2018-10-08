@@ -2,7 +2,7 @@ package com.honhai.foxconn.hometank.network;
 
 public class TcpSerCliConstant {
 
-    final static String SERVER_IP = "192.168.1.82";
+    final static String SERVER_IP = "192.168.1.45";
     final static int PORT = 9488;
 
 

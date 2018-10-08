@@ -14,7 +14,7 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_layout);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         findViews();
         setListener();
     }
@@ -22,7 +22,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void setListener() {
         button.setOnClickListener(v -> {
             Intent intent = new Intent();
-            intent.setClass(this,PreparationActivity.class);
+            intent.setClass(this, PreparationActivity.class);
             startActivity(intent);
         });
     }
@@ -30,5 +30,4 @@ public class WelcomeActivity extends AppCompatActivity {
     private void findViews() {
         button = findViewById(R.id.button);
     }
-
 }
