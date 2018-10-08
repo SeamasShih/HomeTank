@@ -47,14 +47,14 @@ public class GameData {
     private Picture map = new Picture();
     private int mapW = 27;
     private int mapH = 19;
-    private int roadNum = mapW*mapH/3;
+    private int roadNum = mapW * mapH / 3;
     private GameActivity activity;
 
     public int getMyType() {
         return getMySelf().type;
     }
 
-    private enum GenerateMap{
+    private enum GenerateMap {
         CONTAIN,
         INVALID,
         PASS
@@ -72,7 +72,7 @@ public class GameData {
         this.activity = activity;
     }
 
-    public void setMapData(MapData[][] data){
+    public void setMapData(MapData[][] data) {
         this.mapData = data;
 
         boxSet.setMapBox(mapData, interval);
@@ -87,10 +87,10 @@ public class GameData {
             }
         }
         generateRoad();
-        for (int i = 0 ; i < mapH*mapW/30 ; i++) {
+        for (int i = 0; i < mapH * mapW / 30; i++) {
             generateWater();
         }
-        for (int i = 0 ; i < mapH*mapW/40 ; i++) {
+        for (int i = 0; i < mapH * mapW / 40; i++) {
             generatePillar();
         }
         checkMap(mapData);
@@ -103,35 +103,35 @@ public class GameData {
         int x = getRandom(mapW);
         int y = getRandom(mapH);
         int rate = 5;
-        for (int i = 0 ; i < 10 ; i++){
+        for (int i = 0; i < 10; i++) {
             if (!MapFunction.isRoad(mapData[x][y]) && !MapFunction.isPillar(mapData[x][y]))
                 break;
             x = getRandom(mapW);
             y = getRandom(mapH);
         }
         mapData[x][y] = MapData.BRICK;
-        arrayList.add(new Point(x,y));
-        while (!arrayList.isEmpty()){
-            Point now = arrayList.get(arrayList.size()-1);
-            if (now.x != 0 && !MapFunction.isRoad(mapData[now.x-1][now.y]) &&
-                    !MapFunction.isPillar(mapData[now.x-1][now.y]) && getRandom(10) > 10-rate) {
+        arrayList.add(new Point(x, y));
+        while (!arrayList.isEmpty()) {
+            Point now = arrayList.get(arrayList.size() - 1);
+            if (now.x != 0 && !MapFunction.isRoad(mapData[now.x - 1][now.y]) &&
+                    !MapFunction.isPillar(mapData[now.x - 1][now.y]) && getRandom(10) > 10 - rate) {
                 mapData[now.x - 1][now.y] = MapData.BRICK;
-                arrayList.add(new Point(now.x - 1,now.y));
+                arrayList.add(new Point(now.x - 1, now.y));
             }
-            if (now.y != 0 && !MapFunction.isRoad(mapData[now.x][now.y-1]) &&
-                    !MapFunction.isPillar(mapData[now.x][now.y-1]) && getRandom(10) > 10-rate) {
-                mapData[now.x][now.y-1] = MapData.BRICK;
-                arrayList.add(new Point(now.x,now.y-1));
+            if (now.y != 0 && !MapFunction.isRoad(mapData[now.x][now.y - 1]) &&
+                    !MapFunction.isPillar(mapData[now.x][now.y - 1]) && getRandom(10) > 10 - rate) {
+                mapData[now.x][now.y - 1] = MapData.BRICK;
+                arrayList.add(new Point(now.x, now.y - 1));
             }
-            if (now.x != mapW-1 && !MapFunction.isRoad(mapData[now.x+1][now.y]) &&
-                    !MapFunction.isPillar(mapData[now.x+1][now.y]) && getRandom(10) > 10-rate) {
+            if (now.x != mapW - 1 && !MapFunction.isRoad(mapData[now.x + 1][now.y]) &&
+                    !MapFunction.isPillar(mapData[now.x + 1][now.y]) && getRandom(10) > 10 - rate) {
                 mapData[now.x + 1][now.y] = MapData.BRICK;
-                arrayList.add(new Point(now.x + 1,now.y));
+                arrayList.add(new Point(now.x + 1, now.y));
             }
-            if (now.y != mapH-1 && !MapFunction.isRoad(mapData[now.x][now.y+1]) &&
-                    !MapFunction.isPillar(mapData[now.x][now.y+1]) && getRandom(10) > 10-rate) {
-                mapData[now.x][now.y+1] = MapData.BRICK;
-                arrayList.add(new Point(now.x,now.y+1));
+            if (now.y != mapH - 1 && !MapFunction.isRoad(mapData[now.x][now.y + 1]) &&
+                    !MapFunction.isPillar(mapData[now.x][now.y + 1]) && getRandom(10) > 10 - rate) {
+                mapData[now.x][now.y + 1] = MapData.BRICK;
+                arrayList.add(new Point(now.x, now.y + 1));
             }
             arrayList.remove(now);
         }
@@ -142,78 +142,77 @@ public class GameData {
         int x = getRandom(mapW);
         int y = getRandom(mapH);
         int rate = 7;
-        for (int i = 0 ; i < 20 ; i++){
+        for (int i = 0; i < 20; i++) {
             if (!MapFunction.isRoad(mapData[x][y]) && !MapFunction.isRiver(mapData[x][y]))
                 break;
             x = getRandom(mapW);
             y = getRandom(mapH);
         }
         mapData[x][y] = MapData.RIVER_END_ALL;
-        arrayList.add(new Point(x,y));
-        while (!arrayList.isEmpty()){
-            Point now = arrayList.get(arrayList.size()-1);
-            if (now.x != 0 && !MapFunction.isRoad(mapData[now.x-1][now.y]) &&
-                    !MapFunction.isRiver(mapData[now.x-1][now.y]) && getRandom(10) > 10-rate) {
+        arrayList.add(new Point(x, y));
+        while (!arrayList.isEmpty()) {
+            Point now = arrayList.get(arrayList.size() - 1);
+            if (now.x != 0 && !MapFunction.isRoad(mapData[now.x - 1][now.y]) &&
+                    !MapFunction.isRiver(mapData[now.x - 1][now.y]) && getRandom(10) > 10 - rate) {
                 mapData[now.x - 1][now.y] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x - 1,now.y));
+                arrayList.add(new Point(now.x - 1, now.y));
             }
-            if (now.y != 0 && !MapFunction.isRoad(mapData[now.x][now.y-1]) &&
-                    !MapFunction.isRiver(mapData[now.x][now.y-1]) && getRandom(10) > 10-rate) {
-                mapData[now.x][now.y-1] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x,now.y-1));
+            if (now.y != 0 && !MapFunction.isRoad(mapData[now.x][now.y - 1]) &&
+                    !MapFunction.isRiver(mapData[now.x][now.y - 1]) && getRandom(10) > 10 - rate) {
+                mapData[now.x][now.y - 1] = MapData.RIVER_END_ALL;
+                arrayList.add(new Point(now.x, now.y - 1));
             }
-            if (now.x != mapW-1 && !MapFunction.isRoad(mapData[now.x+1][now.y]) &&
-                    !MapFunction.isRiver(mapData[now.x+1][now.y]) && getRandom(10) > 10-rate) {
+            if (now.x != mapW - 1 && !MapFunction.isRoad(mapData[now.x + 1][now.y]) &&
+                    !MapFunction.isRiver(mapData[now.x + 1][now.y]) && getRandom(10) > 10 - rate) {
                 mapData[now.x + 1][now.y] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x + 1,now.y));
+                arrayList.add(new Point(now.x + 1, now.y));
             }
-            if (now.y != mapH-1 && !MapFunction.isRoad(mapData[now.x][now.y+1]) &&
-                    !MapFunction.isRiver(mapData[now.x][now.y+1]) && getRandom(10) > 10-rate) {
-                mapData[now.x][now.y+1] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x,now.y+1));
+            if (now.y != mapH - 1 && !MapFunction.isRoad(mapData[now.x][now.y + 1]) &&
+                    !MapFunction.isRiver(mapData[now.x][now.y + 1]) && getRandom(10) > 10 - rate) {
+                mapData[now.x][now.y + 1] = MapData.RIVER_END_ALL;
+                arrayList.add(new Point(now.x, now.y + 1));
             }
             arrayList.remove(now);
         }
     }
 
-    private void generateRoad(){
+    private void generateRoad() {
         ArrayList<Point> arrayList = new ArrayList<>();
-        arrayList.add(new Point((mapData.length-1)/2,(mapData[0].length-1)/2));
+        arrayList.add(new Point((mapData.length - 1) / 2, (mapData[0].length - 1) / 2));
         int start;
         int lx = mapData.length;
         int ly = mapData[0].length;
         boolean isFirst = true;
         Point point;
-        while (arrayList.size() <= roadNum){
+        while (arrayList.size() <= roadNum) {
             point = new Point();
-            point.set(getRandom(lx),getRandom(ly));
+            point.set(getRandom(lx), getRandom(ly));
             start = getRandom(arrayList.size());
-            while (checkRoadPoint(arrayList,point) != GenerateMap.PASS){
-                point.set(getRandom(lx),getRandom(ly));
+            while (checkRoadPoint(arrayList, point) != GenerateMap.PASS) {
+                point.set(getRandom(lx), getRandom(ly));
             }
             if (isFirst) {
                 firstGenerateRoadFromTo(arrayList, start, point);
                 isFirst = false;
-            }
-            else
+            } else
                 generateRoadFromTo(arrayList, start, point);
         }
         arrayList.forEach(point1 -> mapData[point1.x][point1.y] = MapData.TEST_ROAD);
     }
 
-    private boolean arrayListContain(ArrayList<Point> arrayList , Point point){
+    private boolean arrayListContain(ArrayList<Point> arrayList, Point point) {
         int i = 0;
-        while (i < arrayList.size()){
-            if (arrayList.get(i).equals(point.x,point.y))
+        while (i < arrayList.size()) {
+            if (arrayList.get(i).equals(point.x, point.y))
                 return true;
         }
         return false;
     }
 
-    private boolean arrayListContain(ArrayList<Point> arrayList , int x , int y){
+    private boolean arrayListContain(ArrayList<Point> arrayList, int x, int y) {
         int i = 0;
-        while (i < arrayList.size()){
-            if (arrayList.get(i).equals(x,y))
+        while (i < arrayList.size()) {
+            if (arrayList.get(i).equals(x, y))
                 return true;
             i++;
         }
@@ -222,36 +221,32 @@ public class GameData {
 
     private void generateRoadFromTo(ArrayList<Point> arrayList, int start, Point to) {
         Point aim = arrayList.get(start);
-        Point from = new Point(to.x,to.y);
+        Point from = new Point(to.x, to.y);
         ArrayList<Point> tempArray = new ArrayList<>();
         tempArray.add(to);
         boolean next = true;
-        while (!arrayListContain(arrayList,from.x-1 , from.y) && !arrayListContain(arrayList,from.x+1 , from.y) &&
-                !arrayListContain(arrayList,from.x , from.y-1) && !arrayListContain(arrayList,from.x , from.y+1)){
+        while (!arrayListContain(arrayList, from.x - 1, from.y) && !arrayListContain(arrayList, from.x + 1, from.y) &&
+                !arrayListContain(arrayList, from.x, from.y - 1) && !arrayListContain(arrayList, from.x, from.y + 1)) {
             Point point = new Point();
 
-            switch (getRandom(2)){
+            switch (getRandom(2)) {
                 case 0: //horizon
                     if (from.x < aim.x) {
-                        point =  new Point(from.x + 1, from.y);
-                        next = addPointToArray(tempArray,point);
-                    }
-                    else if (from.x > aim.x) {
-                        point =  new Point(from.x - 1, from.y);
+                        point = new Point(from.x + 1, from.y);
                         next = addPointToArray(tempArray, point);
-                    }
-                    else {
-                        if (from.x == mapData.length-1){
-                            point =  new Point(from.x - 1, from.y);
+                    } else if (from.x > aim.x) {
+                        point = new Point(from.x - 1, from.y);
+                        next = addPointToArray(tempArray, point);
+                    } else {
+                        if (from.x == mapData.length - 1) {
+                            point = new Point(from.x - 1, from.y);
                             next = addPointToArray(tempArray, point);
-                        }
-                        else if (from.x == 0){
-                            point =  new Point(from.x + 1, from.y);
+                        } else if (from.x == 0) {
+                            point = new Point(from.x + 1, from.y);
                             next = addPointToArray(tempArray, point);
-                        }
-                        else {
-                            point =  new Point((getRandom(2) == 1 ? from.x + 1 : from.x - 1), from.y);
-                            if (checkRoadPoint(arrayList,point) == GenerateMap.INVALID)
+                        } else {
+                            point = new Point((getRandom(2) == 1 ? from.x + 1 : from.x - 1), from.y);
+                            if (checkRoadPoint(arrayList, point) == GenerateMap.INVALID)
                                 continue;
                             next = addPointToArray(tempArray, point);
                         }
@@ -259,24 +254,20 @@ public class GameData {
                     break;
                 case 1: // vertical
                     if (from.y < aim.y) {
-                        point =  new Point(from.x, from.y+1);
-                        next = addPointToArray(tempArray,point);
-                    }
-                    else if (from.y > aim.y) {
-                        point =  new Point(from.x, from.y-1);
+                        point = new Point(from.x, from.y + 1);
                         next = addPointToArray(tempArray, point);
-                    }
-                    else {
-                        if (from.y == mapData[0].length-1){
-                            point =  new Point(from.x, from.y-1);
+                    } else if (from.y > aim.y) {
+                        point = new Point(from.x, from.y - 1);
+                        next = addPointToArray(tempArray, point);
+                    } else {
+                        if (from.y == mapData[0].length - 1) {
+                            point = new Point(from.x, from.y - 1);
                             next = addPointToArray(tempArray, point);
-                        }
-                        else if (from.y == 0){
-                            point =  new Point(from.x, from.y+1);
+                        } else if (from.y == 0) {
+                            point = new Point(from.x, from.y + 1);
                             next = addPointToArray(tempArray, point);
-                        }
-                        else {
-                            point =  new Point(from.x, (getRandom(2) == 1 ? from.y + 1 : from.y - 1));
+                        } else {
+                            point = new Point(from.x, (getRandom(2) == 1 ? from.y + 1 : from.y - 1));
                             next = addPointToArray(tempArray, point);
                         }
                     }
@@ -288,7 +279,7 @@ public class GameData {
         arrayList.addAll(tempArray);
     }
 
-    private GenerateMap checkRoadPoint(ArrayList<Point> arrayList , Point point){
+    private GenerateMap checkRoadPoint(ArrayList<Point> arrayList, Point point) {
         boolean tl = false;
         boolean tr = false;
         boolean bl = false;
@@ -297,24 +288,24 @@ public class GameData {
         boolean l = false;
         boolean r = false;
         boolean b = false;
-        for (int i = 0 ; i < arrayList.size() ; i++){
-            if (arrayList.get(i).equals(point.x,point.y))
+        for (int i = 0; i < arrayList.size(); i++) {
+            if (arrayList.get(i).equals(point.x, point.y))
                 return GenerateMap.CONTAIN;
-            if (arrayList.get(i).equals(point.x-1,point.y-1))
+            if (arrayList.get(i).equals(point.x - 1, point.y - 1))
                 tl = true;
-            else if (arrayList.get(i).equals(point.x+1,point.y-1))
+            else if (arrayList.get(i).equals(point.x + 1, point.y - 1))
                 tr = true;
-            else if (arrayList.get(i).equals(point.x-1,point.y+1))
+            else if (arrayList.get(i).equals(point.x - 1, point.y + 1))
                 bl = true;
-            else if (arrayList.get(i).equals(point.x+1,point.y+1))
+            else if (arrayList.get(i).equals(point.x + 1, point.y + 1))
                 br = true;
-            else if (arrayList.get(i).equals(point.x+1,point.y))
+            else if (arrayList.get(i).equals(point.x + 1, point.y))
                 r = true;
-            else if (arrayList.get(i).equals(point.x-1,point.y))
+            else if (arrayList.get(i).equals(point.x - 1, point.y))
                 l = true;
-            else if (arrayList.get(i).equals(point.x,point.y+1))
+            else if (arrayList.get(i).equals(point.x, point.y + 1))
                 b = true;
-            else if (arrayList.get(i).equals(point.x,point.y-1))
+            else if (arrayList.get(i).equals(point.x, point.y - 1))
                 t = true;
         }
         if (tr && (t && r) || tl && (t && l) || bl && (b && l) || br && (b && r))
@@ -323,62 +314,54 @@ public class GameData {
         return GenerateMap.PASS;
     }
 
-    private void firstGenerateRoadFromTo(ArrayList<Point> arrayList , int start , Point to) {
+    private void firstGenerateRoadFromTo(ArrayList<Point> arrayList, int start, Point to) {
         Point from = arrayList.get(start);
         boolean next = true;
-        while (!from.equals(to.x,to.y)){
+        while (!from.equals(to.x, to.y)) {
             Point point = new Point();
 
-            if (from.equals(to.x-1,to.y) ||from.equals(to.x+1,to.y) || from.equals(to.x,to.y-1) || from.equals(to.x,to.y+1)){
+            if (from.equals(to.x - 1, to.y) || from.equals(to.x + 1, to.y) || from.equals(to.x, to.y - 1) || from.equals(to.x, to.y + 1)) {
                 arrayList.add(to);
                 return;
             }
 
-            switch (getRandom(2)){
+            switch (getRandom(2)) {
                 case 0: //horizon
                     if (from.x < to.x) {
-                        point =  new Point(from.x + 1, from.y);
-                        next = addPointToArray(arrayList,point);
-                    }
-                    else if (from.x > to.x) {
-                        point =  new Point(from.x - 1, from.y);
+                        point = new Point(from.x + 1, from.y);
                         next = addPointToArray(arrayList, point);
-                    }
-                    else {
-                        if (from.x == mapData.length-1){
-                            point =  new Point(from.x - 1, from.y);
+                    } else if (from.x > to.x) {
+                        point = new Point(from.x - 1, from.y);
+                        next = addPointToArray(arrayList, point);
+                    } else {
+                        if (from.x == mapData.length - 1) {
+                            point = new Point(from.x - 1, from.y);
                             next = addPointToArray(arrayList, point);
-                        }
-                        else if (from.x == 0){
-                            point =  new Point(from.x + 1, from.y);
+                        } else if (from.x == 0) {
+                            point = new Point(from.x + 1, from.y);
                             next = addPointToArray(arrayList, point);
-                        }
-                        else {
-                            point =  new Point((getRandom(2) == 1 ? from.x + 1 : from.x - 1), from.y);
+                        } else {
+                            point = new Point((getRandom(2) == 1 ? from.x + 1 : from.x - 1), from.y);
                             next = addPointToArray(arrayList, point);
                         }
                     }
                     break;
                 case 1: // vertical
                     if (from.y < to.y) {
-                        point =  new Point(from.x, from.y+1);
-                        next = addPointToArray(arrayList,point);
-                    }
-                    else if (from.y > to.y) {
-                        point =  new Point(from.x, from.y-1);
+                        point = new Point(from.x, from.y + 1);
                         next = addPointToArray(arrayList, point);
-                    }
-                    else {
-                        if (from.y == mapData[0].length-1){
-                            point =  new Point(from.x, from.y-1);
+                    } else if (from.y > to.y) {
+                        point = new Point(from.x, from.y - 1);
+                        next = addPointToArray(arrayList, point);
+                    } else {
+                        if (from.y == mapData[0].length - 1) {
+                            point = new Point(from.x, from.y - 1);
                             next = addPointToArray(arrayList, point);
-                        }
-                        else if (from.y == 0){
-                            point =  new Point(from.x, from.y+1);
+                        } else if (from.y == 0) {
+                            point = new Point(from.x, from.y + 1);
                             next = addPointToArray(arrayList, point);
-                        }
-                        else {
-                            point =  new Point(from.x, (getRandom(2) == 1 ? from.y + 1 : from.y - 1));
+                        } else {
+                            point = new Point(from.x, (getRandom(2) == 1 ? from.y + 1 : from.y - 1));
                             next = addPointToArray(arrayList, point);
                         }
                     }
@@ -389,8 +372,8 @@ public class GameData {
         }
     }
 
-    private boolean addPointToArray(ArrayList<Point> arrayList , Point point){
-        switch (checkRoadPoint(arrayList , point)){
+    private boolean addPointToArray(ArrayList<Point> arrayList, Point point) {
+        switch (checkRoadPoint(arrayList, point)) {
             case CONTAIN:
                 return true;
             case PASS:
@@ -400,9 +383,9 @@ public class GameData {
         return false;
     }
 
-    private int getRandom(int Max){
+    private int getRandom(int Max) {
         int r = (int) (Max * Math.random());
-        return r == Max ? r-1 : r;
+        return r == Max ? r - 1 : r;
     }
 
     private void initialTestMap() {
@@ -424,9 +407,9 @@ public class GameData {
         for (int i = 0; i < mapData.length; i++) {
             for (int j = 0; j < mapData[0].length; j++) {
                 if (MapFunction.isRoad(mapData[i][j]))
-                    checkMapRoad(i,j);
+                    checkMapRoad(i, j);
                 else if (MapFunction.isRiver(mapData[i][j]))
-                    checkMapRiver(i,j);
+                    checkMapRiver(i, j);
             }
         }
     }
@@ -448,13 +431,13 @@ public class GameData {
             r = true;
         if (j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i][j + 1]))
             b = true;
-        if (t && l && MapFunction.isRiver(mapData[i-1][j-1]))
+        if (t && l && MapFunction.isRiver(mapData[i - 1][j - 1]))
             tl = true;
-        if (t && r && i != mapData.length - 1 && MapFunction.isRiver(mapData[i+1][j - 1]))
+        if (t && r && i != mapData.length - 1 && MapFunction.isRiver(mapData[i + 1][j - 1]))
             tr = true;
-        if (b && r && i != mapData.length - 1 && j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i+1][j + 1]))
+        if (b && r && i != mapData.length - 1 && j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i + 1][j + 1]))
             br = true;
-        if (b && l && j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i-1][j + 1]))
+        if (b && l && j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i - 1][j + 1]))
             bl = true;
         if (tl && tr && br && bl)
             mapData[i][j] = MapData.RIVER_SEA_CENTER;
@@ -493,7 +476,7 @@ public class GameData {
         else if (tr)
             mapData[i][j] = MapData.RIVER_SEA_TR;
         else if (br && bl)
-            mapData[i][j] = (t ? MapData.RIVER_SEA_NTbutT: MapData.RIVER_SEA_NT);
+            mapData[i][j] = (t ? MapData.RIVER_SEA_NTbutT : MapData.RIVER_SEA_NT);
         else if (br && t && l)
             mapData[i][j] = MapData.RIVER_SEA_DRbutTL;
         else if (br && t)
@@ -542,7 +525,7 @@ public class GameData {
             mapData[i][j] = MapData.RIVER_END_DOWN;
     }
 
-    private void checkMapRoad(int i , int j){
+    private void checkMapRoad(int i, int j) {
         int road = 0;
         if (i != 0 && MapFunction.isRoad(mapData[i - 1][j]))
             road |= 0b0001; //left
@@ -622,12 +605,12 @@ public class GameData {
         return players.length;
     }
 
-    public void setPlayerTankType(int order , int type) {
-        getPlayer(order).type = type;
+    public void setPlayerTankType(int order, int type) {
+        getPlayer(order).setType(type);
     }
 
     public void setMyTankType(int type) {
-        getMySelf().type = type;
+        getMySelf().setType(type);
     }
 
     public void setMyOrder(int myOrder) {
@@ -807,18 +790,18 @@ public class GameData {
         while (bullets[bulletSite] != null) {
             bulletSite = (bulletSite + 1) % bullets.length;
         }
-        if (player.type == 2){
+        if (player.type == 2) {
             float[] f = new float[]{interval / 2 * 1.414f, 0};
             Matrix matrix = new Matrix();
             matrix.setRotate(player.gunTheta);
             matrix.mapPoints(f);
 
-            float[] a = new float[]{(2 + (player.getGunLength()-30)*5/70)*interval,0};
+            float[] a = new float[]{(2 + (player.getGunLength() - 30) * 5 / 70) * interval, 0};
             matrix.mapPoints(a);
 
             bullets[bulletSite] = new Bullet(player.type, player.x + f[0], player.y + f[1],
-                    System.currentTimeMillis(), player.x + a[0] , player.y + a[1], player.gunTheta , bulletSite);
-        }else {
+                    System.currentTimeMillis(), player.x + a[0], player.y + a[1], player.gunTheta, bulletSite);
+        } else {
             float[] f = new float[]{interval / 2 * 1.414f, 0};
             Matrix matrix = new Matrix();
             matrix.setRotate(player.gunTheta);
@@ -830,7 +813,7 @@ public class GameData {
 
     }
 
-    public void addBullet(int playerType, float x, float y, long it, float gunLength , float gunTheta) {
+    public void addBullet(int playerType, float x, float y, long it, float gunLength, float gunTheta) {
         while (bullets[bulletSite] != null) {
             bulletSite = (bulletSite + 1) % bullets.length;
         }
@@ -839,11 +822,11 @@ public class GameData {
         matrix.setRotate(gunTheta);
         matrix.mapPoints(f);
 
-        float[] a = new float[]{(2 + (gunLength-30)*5/70)*interval,0};
+        float[] a = new float[]{(2 + (gunLength - 30) * 5 / 70) * interval, 0};
         matrix.mapPoints(a);
 
         bullets[bulletSite] = new Bullet(playerType, x + f[0], y + f[1],
-                it, x + a[0] , y + a[1], gunTheta , bulletSite);
+                it, x + a[0], y + a[1], gunTheta, bulletSite);
     }
 
     public void addBullet(int playerType, float x, float y, long it, float gunTheta) {
@@ -859,20 +842,28 @@ public class GameData {
                 it, gunTheta, bulletSite);
     }
 
-    public void gunRaise(){
+    public void gunRaise() {
         getMySelf().gunRaise();
     }
 
-    public void gunLower(){
+    public void gunLower() {
         getMySelf().gunLower();
     }
 
-    public String getBulletInfo() {
+    public String getBulletInfo(int type) {
         Player p = getMySelf();
-        return " " + p.type
-                + " " + p.x
-                + " " + p.y
-                + " " + p.gunTheta;
+        if (type == 2) {
+            return " " + p.type
+                    + " " + p.x
+                    + " " + p.y
+                    + " " + p.getGunLength()
+                    + " " + p.gunTheta;
+        } else {
+            return " " + p.type
+                    + " " + p.x
+                    + " " + p.y
+                    + " " + p.gunTheta;
+        }
     }
 
     public void nullBullet(int site) {
@@ -928,7 +919,7 @@ public class GameData {
         private boolean go = true;
         public Box box = new Box(bulletL / 4, bulletL);
 
-        public Bullet(int type, float ix, float iy, long it, float ax , float ay,float theta ,  int site){
+        public Bullet(int type, float ix, float iy, long it, float ax, float ay, float theta, int site) {
             this.type = type;
             this.ix = ix;
             this.iy = iy;
@@ -978,7 +969,7 @@ public class GameData {
         public void run() {
             super.run();
             long ct;
-            switch (type){
+            switch (type) {
                 case 0:
                 case 1:
                     ct = System.currentTimeMillis();
@@ -992,7 +983,7 @@ public class GameData {
                         }
                         ct = System.currentTimeMillis();
                     }
-                    if (getMyBox().checkCircleCollision(new CircleBox(x,y,boomL)))
+                    if (getMyBox().checkCircleCollision(new CircleBox(x, y, boomL)))
                         getMySelf().beHurt(type == 0 ? 20 : 50);
                     addBoom(x, y);
                     nullBullet(site);
@@ -1007,7 +998,7 @@ public class GameData {
 
                         ct = System.currentTimeMillis();
                     }
-                    if (getMyBox().checkCircleCollision(new CircleBox(x,y,boomL)))
+                    if (getMyBox().checkCircleCollision(new CircleBox(x, y, boomL)))
                         getMySelf().beHurt(30);
                     addBoom(x, y);
                     nullBullet(site);
@@ -1034,14 +1025,14 @@ public class GameData {
         Paint gunPaint = new Paint();
         Matrix matrix = new Matrix();
 
-        public Player(){
+        public Player() {
             paint.setAntiAlias(true);
-            paint.setColor(Color.argb(80,255,0,0));
+            paint.setColor(Color.argb(80, 255, 0, 0));
             gunPaint.setAntiAlias(true);
-            gunPaint.setColor(Color.rgb(0x20,0x6b,0x20));
+            gunPaint.setColor(Color.rgb(0x20, 0x6b, 0x20));
         }
 
-        public void beHurt(int damage){
+        public void beHurt(int damage) {
             life -= damage;
             if (life <= 0) {
                 isAlive = false;
@@ -1054,35 +1045,35 @@ public class GameData {
             return gunLength;
         }
 
-        public void gunRight(){
+        public void gunRight() {
             gunTheta++;
             setMatrix();
         }
 
-        public void gunLeft(){
+        public void gunLeft() {
             gunTheta--;
             setMatrix();
         }
 
         public void setType(int type) {
             this.type = type;
-            switch (type){
+            switch (type) {
                 case 0:
                     tank = new LightTank();
                     box = new Box(interval * .6f, interval * .5f);
-                    box.set(x,y);
+                    box.set(x, y);
                     speed = 6;
                     break;
                 case 1:
                     tank = new HeavyTank();
                     box = new Box(interval * .8f, interval * .6f);
-                    box.set(x,y);
+                    box.set(x, y);
                     speed = 10;
                     break;
                 case 2:
                     tank = new HeightTank();
                     box = new Box(interval * .6f, interval * .4f);
-                    box.set(x,y);
+                    box.set(x, y);
                     speed = 8;
                     break;
             }
@@ -1093,7 +1084,7 @@ public class GameData {
             y = box.centre.y;
         }
 
-        public void gunRaise(){
+        public void gunRaise() {
             if (gunLength >= 100) {
                 gunLength = 100;
                 return;
@@ -1101,7 +1092,7 @@ public class GameData {
             gunLength++;
         }
 
-        public void gunLower(){
+        public void gunLower() {
             if (gunLength <= 30) {
                 gunLength = 30;
                 return;
@@ -1113,7 +1104,7 @@ public class GameData {
             theta = box.theta;
         }
 
-        private void setMatrix(){
+        private void setMatrix() {
             matrix.setRotate(gunTheta);
         }
 
@@ -1163,7 +1154,7 @@ public class GameData {
             canvas.drawPicture(tank.getGunPicture(), new RectF(
                     -interval / 2, -interval / 2,
                     interval / 2, interval / 2));
-            if (type == 2){
+            if (type == 2) {
                 canvas.rotate(90);
                 canvas.drawRect(-interval / 2*.02f, -interval / 2 * gunLength/100,
                         interval / 2 *.02f, 0,gunPaint);
