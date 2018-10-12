@@ -10,4 +10,5 @@ public class TcpSerCliConstant {
     public final static String C_MAP = "m";
     public final static String C_FIRE = "f";
     public static final String C_PLAYER_SITE = "s";
+    public final static String C_DEAD = "d";
 }

@@ -42,12 +42,13 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
         findViews();
         setListener();
         setTankClient();
+        button.setClickable(false);
     }
 
     private void setListener() {
         button.setOnClickListener(v -> {
             udpTankClient.sendMessage(UdpSerCliConstant.C_READY + gameData.getMyOrder() + tankType);
-            tcpTankClient.sendMessage(TcpSerCliConstant.C_PLAYER_SITE);
+            tcpTankClient.sendMessage(TcpSerCliConstant.C_PLAYER_SITE + gameData.getMyOrder());
             button.setClickable(false);
         });
         light.setOnClickListener(v -> {
@@ -55,18 +56,21 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
             heavy.setBackground(null);
             height.setBackground(null);
             tankType = 0;
+            button.setClickable(true);
         });
         heavy.setOnClickListener(v -> {
             v.setBackgroundResource(R.drawable.choice_background);
             light.setBackground(null);
             height.setBackground(null);
             tankType = 1;
+            button.setClickable(true);
         });
         height.setOnClickListener(v -> {
             v.setBackgroundResource(R.drawable.choice_background);
             heavy.setBackground(null);
             light.setBackground(null);
             tankType = 2;
+            button.setClickable(true);
         });
     }
 
@@ -101,7 +105,6 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
         } else if (message.startsWith(UdpSerCliConstant.S_START_GAME)) {
             gameData.createPlayers(
                     Character.getNumericValue(message.charAt(UdpSerCliConstant.S_START_GAME.length())));
-
             tempSiteList.forEach(ints -> gameData.setPlayersSite(ints[0], ints[1], ints[2]));
             Intent intent = new Intent();
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -137,7 +140,6 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
         } else if (message.startsWith(TcpSerCliConstant.C_PLAYER_SITE)) {
             StringTokenizer tokenizer = new StringTokenizer(message, " ");
             tokenizer.nextToken();
-
             int order = -1;
             while (tokenizer.hasMoreTokens()) {
                 String s = tokenizer.nextToken();

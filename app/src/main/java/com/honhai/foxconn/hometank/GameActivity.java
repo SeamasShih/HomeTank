@@ -77,6 +77,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         setDeadRightListener();
         right.setDeadMode(true);
         left.setDeadMode(true);
+        tcpTankClient.sendMessage(TcpSerCliConstant.C_DEAD + gameData.getMyOrder());
     }
 
     private void setDeadRightListener() {
@@ -460,7 +461,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                             + " " + gameData.getY());
                                 } else {
                                     gameData.littleStepMyBox();
-                                    goUp = false;
+                                    goDown = false;
                                 }
                                 Thread.sleep(gameData.getMySpeed());
                             } catch (InterruptedException e) {
@@ -551,6 +552,9 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                     gameData.addBullet(playerType, x, y, System.currentTimeMillis(), gunTheta);
                 }
             }
+        } else if (message.startsWith(TcpSerCliConstant.C_DEAD)){
+            int order = Character.getNumericValue(message.charAt(TcpSerCliConstant.C_DEAD.length()));
+            gameData.setPlayerAlive(order,false);
         }
     }
 
