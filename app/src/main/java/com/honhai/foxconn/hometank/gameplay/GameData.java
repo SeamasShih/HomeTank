@@ -1,5 +1,7 @@
 package com.honhai.foxconn.hometank.gameplay;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,6 +12,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 
 import com.honhai.foxconn.hometank.GameActivity;
 import com.honhai.foxconn.hometank.collision.Box;
@@ -34,6 +38,7 @@ public class GameData {
     private BoxSet boxSet = new BoxSet();
     private MapData[][] mapData;
     private Player[] players;
+    private ServerPlayerStatus[] serverPlayers;
     private int myOrder = -1;
     private float interval = 120;
     private Bullet[] bullets = new Bullet[15];
@@ -49,6 +54,7 @@ public class GameData {
     private int mapH = 19;
     private int roadNum = mapW * mapH / 3;
     private GameActivity activity;
+    private ValueAnimator receiveAnimation;
 
     public int getMyType() {
         return getMySelf().type;
@@ -61,11 +67,25 @@ public class GameData {
     }
 
     private GameData() {
-//        initialMap();
-//        createPlayers(1);
-//        myOrder = 0;
-//        getMySelf().set((mapW-1)/2*interval,(mapH-1)/2*interval);
-//        getMySelf().setType(2);
+        setAnimation();
+    }
+
+    private void setAnimation(){
+        receiveAnimation = new ValueAnimator();
+        receiveAnimation.setFloatValues(0,100);
+        receiveAnimation.setInterpolator(new AccelerateInterpolator());
+        receiveAnimation.setDuration(100);
+        receiveAnimation.addUpdateListener(animation -> {
+            float r = (float) animation.getAnimatedValue();
+            setSiteByServer(r);
+        });
+    }
+
+    private void setSiteByServer(float r) {
+        for (int i = 0 ; i < players.length ; i++){
+            if (i == myOrder) continue;
+            players[i].setSiteByRate(r,serverPlayers[i]);
+        }
     }
 
     public void setActivity(GameActivity activity) {
@@ -595,6 +615,11 @@ public class GameData {
         for (int i = 0; i < players.length; i++) {
             players[i] = new Player();
         }
+        
+        serverPlayers = new ServerPlayerStatus[amount];
+        for (int i = 0; i < serverPlayers.length; i++) {
+            serverPlayers[i] = new ServerPlayerStatus();
+        }
     }
 
     public float getMyTheta() {
@@ -1048,6 +1073,14 @@ public class GameData {
             gunPaint.setColor(Color.rgb(0x20, 0x6b, 0x20));
         }
 
+        public void setSiteByRate(float r , ServerPlayerStatus s){
+            x = (r * x + (100-r) * s.x) / 100;
+            y = (r * y + (100-r) * s.y) / 100;
+            theta = (r * theta + (100-r) * s.theta) / 100;
+            gunTheta = (r * gunTheta + (100-r) * s.gunTheta) / 100;
+            gunLength = (r * gunLength + (100-r) * s.gunLength) / 100;
+        }
+
         public void beHurt(int damage) {
             life -= damage;
             if (life <= 0) {
@@ -1206,5 +1239,13 @@ public class GameData {
             this.theta = theta;
             box.theta = theta;
         }
+    }
+    
+    private class ServerPlayerStatus{
+        public float x;
+        public float y;
+        public float theta;
+        public float gunTheta;
+        public float gunLength;
     }
 }

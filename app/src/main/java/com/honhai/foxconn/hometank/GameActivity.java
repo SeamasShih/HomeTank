@@ -50,6 +50,18 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private ValueAnimator bulletAdd;
     private UdpTankClient udpTankClient = UdpTankClient.getClient(this);
     private TcpTankClient tcpTankClient = TcpTankClient.getClient(this);
+    private boolean send = true;
+    private Thread sendServer = new Thread(() -> {
+        while (send){
+            //todo Ian send status to server , order + x + y + theta + gunTheta + gunLength(if it needs)
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -252,7 +264,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                         while (goLower) {
                             try {
                                 gameData.gunLower();
-                                //todo Ian
                                 Thread.sleep(gameData.getMySpeed() * 3);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -279,7 +290,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                         while (goRaise) {
                             try {
                                 gameData.gunRaise();
-                                //todo Ian
                                 Thread.sleep(gameData.getMySpeed() * 3);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
