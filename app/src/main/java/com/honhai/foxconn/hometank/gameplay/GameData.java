@@ -99,6 +99,17 @@ public class GameData {
         map = MapPicture.createMap(mapData, interval);
     }
 
+    public float getGunLength() {
+        if (getMyType() == 2) {
+            return getMySelf().getGunLength();
+        }
+        return 0.0f;
+    }
+
+    public void setGunLength(int order, float length) {
+        getPlayer(order).setGunLength(length);
+    }
+
     private void initialMap() {
         mapData = new MapData[mapW][mapH];
         for (int i = 0; i < mapData.length; i++) {
@@ -1093,6 +1104,10 @@ public class GameData {
 
         public float getGunLength() {
             return gunLength;
+        }
+
+        public void setGunLength(float length) {
+            gunLength = length;
         }
 
         public void gunRight() {

@@ -608,6 +608,12 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                 float theta = Float.valueOf(tokenizer.nextToken());
                 gameData.setPlayerGunTheta(order, theta);
             }
+        } else if (message.startsWith(UdpSerCliConstant.C_TANK_LENGTH)) {
+            StringTokenizer tokenizer = new StringTokenizer(message, " ");
+
+            int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_LENGTH.length()));
+            float gunLength = Float.valueOf(tokenizer.nextToken());
+            gameData.setGunLength(order, gunLength);
         }
     }
 }
