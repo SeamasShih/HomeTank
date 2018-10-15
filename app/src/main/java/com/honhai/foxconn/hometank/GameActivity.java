@@ -5,7 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -53,8 +55,14 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private boolean send = true;
     private Thread sendServer = new Thread(() -> {
         while (send){
-            //todo Ian send status to server , order + x + y + theta + gunTheta + gunLength(if it needs)
-
+            float[] s = gameData.getMySite();
+            String message = UdpSerCliConstant.C_TANK_INFO_PER_100MS;
+            message = message + gameData.getMyOrder() + " " +
+                    s[0] + " " + s[1] + " " +
+                    gameData.getMyTheta() + " " +
+                    gameData.getMyGunTheta() + " " +
+                    gameData.getMyGunLength();
+            udpTankClient.sendMessage(message);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -75,6 +83,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         setAnimation();
         setClientInfo();
         gameData.setActivity(this);
+        sendServer.start();
     }
 
     public void iAmDead(){
@@ -330,9 +339,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                         while (goGunLeft) {
                             try {
                                 gameData.gunLeft();
-                                udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_GUN_ROTATION
-                                        + gameData.getMyOrder()
-                                        + " " + gameData.getMyGunTheta());
                                 Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -359,9 +365,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                         while (goGunRight) {
                             try {
                                 gameData.gunRight();
-                                udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_GUN_ROTATION
-                                        + gameData.getMyOrder()
-                                        + " " + gameData.getMyGunTheta());
                                 Thread.sleep(gameData.getMySpeed() * 2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -390,9 +393,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 gameData.littleStepBackRotationMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleBackStepRotationMySite();
-                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_DIR
-                                            + gameData.getMyOrder()
-                                            + " " + gameData.getMyTheta());
                                 } else {
                                     gameData.littleStepRotationMyBox();
                                     goRight = false;
@@ -430,9 +430,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 gameData.littleStepRotationMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepRotationMySite();
-                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_DIR
-                                            + gameData.getMyOrder()
-                                            + " " + gameData.getMyTheta());
                                 } else {
                                     gameData.littleStepBackRotationMyBox();
                                     goLeft = false;
@@ -465,10 +462,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 gameData.littleStepBackMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepBackMySite();
-                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_SITE
-                                            + gameData.getMyOrder()
-                                            + " " + gameData.getX()
-                                            + " " + gameData.getY());
                                 } else {
                                     gameData.littleStepMyBox();
                                     goDown = false;
@@ -501,10 +494,6 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
                                 gameData.littleStepMyBox();
                                 if (!gameData.checkCollision()) {
                                     gameData.littleStepMySite();
-                                    udpTankClient.sendMessage(UdpSerCliConstant.C_TANK_SITE
-                                            + gameData.getMyOrder()
-                                            + " " + gameData.getX()
-                                            + " " + gameData.getY());
                                 } else {
                                     gameData.littleStepBackMyBox();
                                     goUp = false;
@@ -614,6 +603,19 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_LENGTH.length()));
             float gunLength = Float.valueOf(tokenizer.nextToken());
             gameData.setGunLength(order, gunLength);
+        } else if (message.startsWith(UdpSerCliConstant.C_TANK_INFO_PER_100MS)){
+            StringTokenizer tokenizer = new StringTokenizer(message, " ");
+            int order = Character.getNumericValue(tokenizer.nextToken().charAt(UdpSerCliConstant.C_TANK_INFO_PER_100MS.length()));
+            if (order != gameData.getMyOrder()){
+                float x = Float.valueOf(tokenizer.nextToken());
+                float y = Float.valueOf(tokenizer.nextToken());
+                float theta = Float.valueOf(tokenizer.nextToken());
+                float gunTheta = Float.valueOf(tokenizer.nextToken());
+                float gunLength = Float.valueOf(tokenizer.nextToken());
+                gameData.stopAnimation();
+                gameData.setPlayerInfoByServer(order,x,y,theta,gunTheta,gunLength);
+                gameData.startAnimation();
+            }
         }
     }
 }

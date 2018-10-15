@@ -105,7 +105,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
         } else if (message.startsWith(UdpSerCliConstant.S_START_GAME)) {
             gameData.createPlayers(
                     Character.getNumericValue(message.charAt(UdpSerCliConstant.S_START_GAME.length())));
-            tempSiteList.forEach(ints -> gameData.setPlayersSite(ints[0], ints[1], ints[2]));
+            tempSiteList.forEach(ints -> gameData.initialPlayerSite(ints[0], ints[1], ints[2]));
             Intent intent = new Intent();
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.setClass(this, GameActivity.class);

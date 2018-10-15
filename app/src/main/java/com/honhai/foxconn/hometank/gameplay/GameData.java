@@ -1,19 +1,14 @@
 package com.honhai.foxconn.hometank.gameplay;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Picture;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 
 import com.honhai.foxconn.hometank.GameActivity;
 import com.honhai.foxconn.hometank.collision.Box;
@@ -25,10 +20,8 @@ import com.honhai.foxconn.hometank.gameplay.tankdrawable.HeightTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.LightTank;
 import com.honhai.foxconn.hometank.gameplay.tankdrawable.TankPrototype;
 import com.honhai.foxconn.hometank.map.MapData;
-import com.honhai.foxconn.hometank.map.MapFunction;
 import com.honhai.foxconn.hometank.map.MapPicture;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GameData {
@@ -38,7 +31,8 @@ public class GameData {
     private BoxSet boxSet = new BoxSet();
     private MapData[][] mapData;
     private Player[] players;
-    private ServerPlayerStatus[] serverPlayers;
+    private ServerPlayerStatus[] newServerPlayers;
+    private ServerPlayerStatus[] oldServerPlayers;
     private int myOrder = -1;
     private float interval = 120;
     private Bullet[] bullets = new Bullet[15];
@@ -54,37 +48,39 @@ public class GameData {
     private int mapH = 19;
     private int roadNum = mapW * mapH / 3;
     private GameActivity activity;
-    private ValueAnimator receiveAnimation;
+    private MyAnimation receiveAnimation = new MyAnimation();
 
     public int getMyType() {
         return getMySelf().type;
     }
 
-    private enum GenerateMap {
-        CONTAIN,
-        INVALID,
-        PASS
+    private GameData(){
     }
 
-    private GameData() {
-        setAnimation();
+    public void setPlayerInfoByServer(int order , float x , float y , float theta , float gunTheta , float gunLength){
+        newServerPlayers[order].x = x;
+        newServerPlayers[order].y = y;
+        newServerPlayers[order].theta = theta;
+        newServerPlayers[order].gunTheta = gunTheta;
+        newServerPlayers[order].gunLength = gunLength;
     }
 
-    private void setAnimation(){
-        receiveAnimation = new ValueAnimator();
-        receiveAnimation.setFloatValues(0,100);
-        receiveAnimation.setInterpolator(new AccelerateInterpolator());
-        receiveAnimation.setDuration(100);
-        receiveAnimation.addUpdateListener(animation -> {
-            float r = (float) animation.getAnimatedValue();
-            setSiteByServer(r);
-        });
+    public void startAnimation(){
+        for (int i = 0 ; i < oldServerPlayers.length ; i++){
+            oldServerPlayers[i].set(players[i]);
+        }
+        receiveAnimation = new MyAnimation();
+        receiveAnimation.start();
+    }
+
+    public void stopAnimation(){
+        receiveAnimation.halt();
     }
 
     private void setSiteByServer(float r) {
         for (int i = 0 ; i < players.length ; i++){
             if (i == myOrder) continue;
-            players[i].setSiteByRate(r,serverPlayers[i]);
+            players[i].setSiteByRate(r,oldServerPlayers[i], newServerPlayers[i]);
         }
     }
 
@@ -99,7 +95,11 @@ public class GameData {
         map = MapPicture.createMap(mapData, interval);
     }
 
-    public float getGunLength() {
+    public float[] getMySite(){
+        return new float[]{getMySelf().x , getMySelf().y};
+    }
+
+    public float getMyGunLength() {
         if (getMyType() == 2) {
             return getMySelf().getGunLength();
         }
@@ -108,511 +108,6 @@ public class GameData {
 
     public void setGunLength(int order, float length) {
         getPlayer(order).setGunLength(length);
-    }
-
-    private void initialMap() {
-        mapData = new MapData[mapW][mapH];
-        for (int i = 0; i < mapData.length; i++) {
-            for (int j = 0; j < mapData[0].length; j++) {
-                mapData[i][j] = MapData.SAND;
-            }
-        }
-        generateRoad();
-        for (int i = 0; i < mapH * mapW / 30; i++) {
-            generateWater();
-        }
-        for (int i = 0; i < mapH * mapW / 40; i++) {
-            generatePillar();
-        }
-        checkMap(mapData);
-        boxSet.setMapBox(mapData, interval);
-        map = MapPicture.createMap(mapData, interval);
-    }
-
-    private void generatePillar() {
-        ArrayList<Point> arrayList = new ArrayList<>();
-        int x = getRandom(mapW);
-        int y = getRandom(mapH);
-        int rate = 5;
-        for (int i = 0; i < 10; i++) {
-            if (!MapFunction.isRoad(mapData[x][y]) && !MapFunction.isPillar(mapData[x][y]))
-                break;
-            x = getRandom(mapW);
-            y = getRandom(mapH);
-        }
-        mapData[x][y] = MapData.BRICK;
-        arrayList.add(new Point(x, y));
-        while (!arrayList.isEmpty()) {
-            Point now = arrayList.get(arrayList.size() - 1);
-            if (now.x != 0 && !MapFunction.isRoad(mapData[now.x - 1][now.y]) &&
-                    !MapFunction.isPillar(mapData[now.x - 1][now.y]) && getRandom(10) > 10 - rate) {
-                mapData[now.x - 1][now.y] = MapData.BRICK;
-                arrayList.add(new Point(now.x - 1, now.y));
-            }
-            if (now.y != 0 && !MapFunction.isRoad(mapData[now.x][now.y - 1]) &&
-                    !MapFunction.isPillar(mapData[now.x][now.y - 1]) && getRandom(10) > 10 - rate) {
-                mapData[now.x][now.y - 1] = MapData.BRICK;
-                arrayList.add(new Point(now.x, now.y - 1));
-            }
-            if (now.x != mapW - 1 && !MapFunction.isRoad(mapData[now.x + 1][now.y]) &&
-                    !MapFunction.isPillar(mapData[now.x + 1][now.y]) && getRandom(10) > 10 - rate) {
-                mapData[now.x + 1][now.y] = MapData.BRICK;
-                arrayList.add(new Point(now.x + 1, now.y));
-            }
-            if (now.y != mapH - 1 && !MapFunction.isRoad(mapData[now.x][now.y + 1]) &&
-                    !MapFunction.isPillar(mapData[now.x][now.y + 1]) && getRandom(10) > 10 - rate) {
-                mapData[now.x][now.y + 1] = MapData.BRICK;
-                arrayList.add(new Point(now.x, now.y + 1));
-            }
-            arrayList.remove(now);
-        }
-    }
-
-    private void generateWater() {
-        ArrayList<Point> arrayList = new ArrayList<>();
-        int x = getRandom(mapW);
-        int y = getRandom(mapH);
-        int rate = 7;
-        for (int i = 0; i < 20; i++) {
-            if (!MapFunction.isRoad(mapData[x][y]) && !MapFunction.isRiver(mapData[x][y]))
-                break;
-            x = getRandom(mapW);
-            y = getRandom(mapH);
-        }
-        mapData[x][y] = MapData.RIVER_END_ALL;
-        arrayList.add(new Point(x, y));
-        while (!arrayList.isEmpty()) {
-            Point now = arrayList.get(arrayList.size() - 1);
-            if (now.x != 0 && !MapFunction.isRoad(mapData[now.x - 1][now.y]) &&
-                    !MapFunction.isRiver(mapData[now.x - 1][now.y]) && getRandom(10) > 10 - rate) {
-                mapData[now.x - 1][now.y] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x - 1, now.y));
-            }
-            if (now.y != 0 && !MapFunction.isRoad(mapData[now.x][now.y - 1]) &&
-                    !MapFunction.isRiver(mapData[now.x][now.y - 1]) && getRandom(10) > 10 - rate) {
-                mapData[now.x][now.y - 1] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x, now.y - 1));
-            }
-            if (now.x != mapW - 1 && !MapFunction.isRoad(mapData[now.x + 1][now.y]) &&
-                    !MapFunction.isRiver(mapData[now.x + 1][now.y]) && getRandom(10) > 10 - rate) {
-                mapData[now.x + 1][now.y] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x + 1, now.y));
-            }
-            if (now.y != mapH - 1 && !MapFunction.isRoad(mapData[now.x][now.y + 1]) &&
-                    !MapFunction.isRiver(mapData[now.x][now.y + 1]) && getRandom(10) > 10 - rate) {
-                mapData[now.x][now.y + 1] = MapData.RIVER_END_ALL;
-                arrayList.add(new Point(now.x, now.y + 1));
-            }
-            arrayList.remove(now);
-        }
-    }
-
-    private void generateRoad() {
-        ArrayList<Point> arrayList = new ArrayList<>();
-        arrayList.add(new Point((mapData.length - 1) / 2, (mapData[0].length - 1) / 2));
-        int start;
-        int lx = mapData.length;
-        int ly = mapData[0].length;
-        boolean isFirst = true;
-        Point point;
-        while (arrayList.size() <= roadNum) {
-            point = new Point();
-            point.set(getRandom(lx), getRandom(ly));
-            start = getRandom(arrayList.size());
-            while (checkRoadPoint(arrayList, point) != GenerateMap.PASS) {
-                point.set(getRandom(lx), getRandom(ly));
-            }
-            if (isFirst) {
-                firstGenerateRoadFromTo(arrayList, start, point);
-                isFirst = false;
-            } else
-                generateRoadFromTo(arrayList, start, point);
-        }
-        arrayList.forEach(point1 -> mapData[point1.x][point1.y] = MapData.TEST_ROAD);
-    }
-
-    private boolean arrayListContain(ArrayList<Point> arrayList, Point point) {
-        int i = 0;
-        while (i < arrayList.size()) {
-            if (arrayList.get(i).equals(point.x, point.y))
-                return true;
-        }
-        return false;
-    }
-
-    private boolean arrayListContain(ArrayList<Point> arrayList, int x, int y) {
-        int i = 0;
-        while (i < arrayList.size()) {
-            if (arrayList.get(i).equals(x, y))
-                return true;
-            i++;
-        }
-        return false;
-    }
-
-    private void generateRoadFromTo(ArrayList<Point> arrayList, int start, Point to) {
-        Point aim = arrayList.get(start);
-        Point from = new Point(to.x, to.y);
-        ArrayList<Point> tempArray = new ArrayList<>();
-        tempArray.add(to);
-        boolean next = true;
-        while (!arrayListContain(arrayList, from.x - 1, from.y) && !arrayListContain(arrayList, from.x + 1, from.y) &&
-                !arrayListContain(arrayList, from.x, from.y - 1) && !arrayListContain(arrayList, from.x, from.y + 1)) {
-            Point point = new Point();
-
-            switch (getRandom(2)) {
-                case 0: //horizon
-                    if (from.x < aim.x) {
-                        point = new Point(from.x + 1, from.y);
-                        next = addPointToArray(tempArray, point);
-                    } else if (from.x > aim.x) {
-                        point = new Point(from.x - 1, from.y);
-                        next = addPointToArray(tempArray, point);
-                    } else {
-                        if (from.x == mapData.length - 1) {
-                            point = new Point(from.x - 1, from.y);
-                            next = addPointToArray(tempArray, point);
-                        } else if (from.x == 0) {
-                            point = new Point(from.x + 1, from.y);
-                            next = addPointToArray(tempArray, point);
-                        } else {
-                            point = new Point((getRandom(2) == 1 ? from.x + 1 : from.x - 1), from.y);
-                            if (checkRoadPoint(arrayList, point) == GenerateMap.INVALID)
-                                continue;
-                            next = addPointToArray(tempArray, point);
-                        }
-                    }
-                    break;
-                case 1: // vertical
-                    if (from.y < aim.y) {
-                        point = new Point(from.x, from.y + 1);
-                        next = addPointToArray(tempArray, point);
-                    } else if (from.y > aim.y) {
-                        point = new Point(from.x, from.y - 1);
-                        next = addPointToArray(tempArray, point);
-                    } else {
-                        if (from.y == mapData[0].length - 1) {
-                            point = new Point(from.x, from.y - 1);
-                            next = addPointToArray(tempArray, point);
-                        } else if (from.y == 0) {
-                            point = new Point(from.x, from.y + 1);
-                            next = addPointToArray(tempArray, point);
-                        } else {
-                            point = new Point(from.x, (getRandom(2) == 1 ? from.y + 1 : from.y - 1));
-                            next = addPointToArray(tempArray, point);
-                        }
-                    }
-                    break;
-            }
-            if (next)
-                from = point;
-        }
-        arrayList.addAll(tempArray);
-    }
-
-    private GenerateMap checkRoadPoint(ArrayList<Point> arrayList, Point point) {
-        boolean tl = false;
-        boolean tr = false;
-        boolean bl = false;
-        boolean br = false;
-        boolean t = false;
-        boolean l = false;
-        boolean r = false;
-        boolean b = false;
-        for (int i = 0; i < arrayList.size(); i++) {
-            if (arrayList.get(i).equals(point.x, point.y))
-                return GenerateMap.CONTAIN;
-            if (arrayList.get(i).equals(point.x - 1, point.y - 1))
-                tl = true;
-            else if (arrayList.get(i).equals(point.x + 1, point.y - 1))
-                tr = true;
-            else if (arrayList.get(i).equals(point.x - 1, point.y + 1))
-                bl = true;
-            else if (arrayList.get(i).equals(point.x + 1, point.y + 1))
-                br = true;
-            else if (arrayList.get(i).equals(point.x + 1, point.y))
-                r = true;
-            else if (arrayList.get(i).equals(point.x - 1, point.y))
-                l = true;
-            else if (arrayList.get(i).equals(point.x, point.y + 1))
-                b = true;
-            else if (arrayList.get(i).equals(point.x, point.y - 1))
-                t = true;
-        }
-        if (tr && (t && r) || tl && (t && l) || bl && (b && l) || br && (b && r))
-            return GenerateMap.INVALID;
-
-        return GenerateMap.PASS;
-    }
-
-    private void firstGenerateRoadFromTo(ArrayList<Point> arrayList, int start, Point to) {
-        Point from = arrayList.get(start);
-        boolean next = true;
-        while (!from.equals(to.x, to.y)) {
-            Point point = new Point();
-
-            if (from.equals(to.x - 1, to.y) || from.equals(to.x + 1, to.y) || from.equals(to.x, to.y - 1) || from.equals(to.x, to.y + 1)) {
-                arrayList.add(to);
-                return;
-            }
-
-            switch (getRandom(2)) {
-                case 0: //horizon
-                    if (from.x < to.x) {
-                        point = new Point(from.x + 1, from.y);
-                        next = addPointToArray(arrayList, point);
-                    } else if (from.x > to.x) {
-                        point = new Point(from.x - 1, from.y);
-                        next = addPointToArray(arrayList, point);
-                    } else {
-                        if (from.x == mapData.length - 1) {
-                            point = new Point(from.x - 1, from.y);
-                            next = addPointToArray(arrayList, point);
-                        } else if (from.x == 0) {
-                            point = new Point(from.x + 1, from.y);
-                            next = addPointToArray(arrayList, point);
-                        } else {
-                            point = new Point((getRandom(2) == 1 ? from.x + 1 : from.x - 1), from.y);
-                            next = addPointToArray(arrayList, point);
-                        }
-                    }
-                    break;
-                case 1: // vertical
-                    if (from.y < to.y) {
-                        point = new Point(from.x, from.y + 1);
-                        next = addPointToArray(arrayList, point);
-                    } else if (from.y > to.y) {
-                        point = new Point(from.x, from.y - 1);
-                        next = addPointToArray(arrayList, point);
-                    } else {
-                        if (from.y == mapData[0].length - 1) {
-                            point = new Point(from.x, from.y - 1);
-                            next = addPointToArray(arrayList, point);
-                        } else if (from.y == 0) {
-                            point = new Point(from.x, from.y + 1);
-                            next = addPointToArray(arrayList, point);
-                        } else {
-                            point = new Point(from.x, (getRandom(2) == 1 ? from.y + 1 : from.y - 1));
-                            next = addPointToArray(arrayList, point);
-                        }
-                    }
-                    break;
-            }
-            if (next)
-                from = point;
-        }
-    }
-
-    private boolean addPointToArray(ArrayList<Point> arrayList, Point point) {
-        switch (checkRoadPoint(arrayList, point)) {
-            case CONTAIN:
-                return true;
-            case PASS:
-                arrayList.add(point);
-                return true;
-        }
-        return false;
-    }
-
-    private int getRandom(int Max) {
-        int r = (int) (Max * Math.random());
-        return r == Max ? r - 1 : r;
-    }
-
-    private void initialTestMap() {
-        mapData = new MapData[19][15];
-        for (int i = 0; i < mapData.length; i++) {
-            for (int j = 0; j < mapData[0].length; j++) {
-                if (i % 2 == 0 || j % 2 == 0)
-                    mapData[i][j] = MapData.TEST_ROAD;
-                else
-                    mapData[i][j] = MapData.BRICK;
-            }
-        }
-        checkMap(mapData);
-        boxSet.setMapBox(mapData, interval);
-        map = MapPicture.createMap(mapData, interval);
-    }
-
-    private void checkMap(MapData[][] mapData) {
-        for (int i = 0; i < mapData.length; i++) {
-            for (int j = 0; j < mapData[0].length; j++) {
-                if (MapFunction.isRoad(mapData[i][j]))
-                    checkMapRoad(i, j);
-                else if (MapFunction.isRiver(mapData[i][j]))
-                    checkMapRiver(i, j);
-            }
-        }
-    }
-
-    private void checkMapRiver(int i, int j) {
-        boolean tl = false;
-        boolean tr = false;
-        boolean bl = false;
-        boolean br = false;
-        boolean t = false;
-        boolean l = false;
-        boolean r = false;
-        boolean b = false;
-        if (i != 0 && MapFunction.isRiver(mapData[i - 1][j]))
-            l = true;
-        if (j != 0 && MapFunction.isRiver(mapData[i][j - 1]))
-            t = true;
-        if (i != mapData.length - 1 && MapFunction.isRiver(mapData[i + 1][j]))
-            r = true;
-        if (j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i][j + 1]))
-            b = true;
-        if (t && l && MapFunction.isRiver(mapData[i - 1][j - 1]))
-            tl = true;
-        if (t && r && i != mapData.length - 1 && MapFunction.isRiver(mapData[i + 1][j - 1]))
-            tr = true;
-        if (b && r && i != mapData.length - 1 && j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i + 1][j + 1]))
-            br = true;
-        if (b && l && j != mapData[0].length - 1 && MapFunction.isRiver(mapData[i - 1][j + 1]))
-            bl = true;
-        if (tl && tr && br && bl)
-            mapData[i][j] = MapData.RIVER_SEA_CENTER;
-        else if (tl && tr && br)
-            mapData[i][j] = MapData.RIVER_SEA_NDL;
-        else if (tl && tr && bl)
-            mapData[i][j] = MapData.RIVER_SEA_NDR;
-        else if (tl && br && bl)
-            mapData[i][j] = MapData.RIVER_SEA_NTR;
-        else if (tl && tr)
-            mapData[i][j] = (b ? MapData.RIVER_SEA_NDbutD : MapData.RIVER_SEA_ND);
-        else if (tl && br)
-            mapData[i][j] = MapData.RIVER_SEA_DRTL;
-        else if (tl && bl)
-            mapData[i][j] = (r ? MapData.RIVER_SEA_NRbutR : MapData.RIVER_SEA_NR);
-        else if (tl && r && b)
-            mapData[i][j] = MapData.RIVER_SEA_TLbutDR;
-        else if (tl && r)
-            mapData[i][j] = MapData.RIVER_SEA_TLbutR;
-        else if (tl && b)
-            mapData[i][j] = MapData.RIVER_SEA_TLbutD;
-        else if (tl)
-            mapData[i][j] = MapData.RIVER_SEA_TL;
-        else if (tr && br && bl)
-            mapData[i][j] = MapData.RIVER_SEA_NTL;
-        else if (tr && br)
-            mapData[i][j] = (l ? MapData.RIVER_SEA_NLbutL : MapData.RIVER_SEA_NL);
-        else if (tr && bl)
-            mapData[i][j] = MapData.RIVER_SEA_DLTR;
-        else if (tr && b && l)
-            mapData[i][j] = MapData.RIVER_SEA_TRbutDL;
-        else if (tr && b)
-            mapData[i][j] = MapData.RIVER_SEA_TRbutD;
-        else if (tr && l)
-            mapData[i][j] = MapData.RIVER_SEA_TRbutL;
-        else if (tr)
-            mapData[i][j] = MapData.RIVER_SEA_TR;
-        else if (br && bl)
-            mapData[i][j] = (t ? MapData.RIVER_SEA_NTbutT : MapData.RIVER_SEA_NT);
-        else if (br && t && l)
-            mapData[i][j] = MapData.RIVER_SEA_DRbutTL;
-        else if (br && t)
-            mapData[i][j] = MapData.RIVER_SEA_DRbutT;
-        else if (br && l)
-            mapData[i][j] = MapData.RIVER_SEA_DRbutL;
-        else if (br)
-            mapData[i][j] = MapData.RIVER_SEA_DR;
-        else if (bl && t && r)
-            mapData[i][j] = MapData.RIVER_SEA_DLbutTR;
-        else if (bl && t)
-            mapData[i][j] = MapData.RIVER_SEA_DLbutT;
-        else if (bl && r)
-            mapData[i][j] = MapData.RIVER_SEA_DLbutR;
-        else if (bl)
-            mapData[i][j] = MapData.RIVER_SEA_DL;
-        else if (l && t && r && b)
-            mapData[i][j] = MapData.RIVER_CROSS;
-        else if (l && t && r)
-            mapData[i][j] = MapData.RIVER_TRI_ND;
-        else if (l && t && b)
-            mapData[i][j] = MapData.RIVER_TRI_NR;
-        else if (l && r && b)
-            mapData[i][j] = MapData.RIVER_TRI_NT;
-        else if (l && t)
-            mapData[i][j] = MapData.RIVER_BEND_TL;
-        else if (l && r)
-            mapData[i][j] = MapData.RIVER_LINE_H;
-        else if (l && b)
-            mapData[i][j] = MapData.RIVER_BEND_DL;
-        else if (l)
-            mapData[i][j] = MapData.RIVER_END_LEFT;
-        else if (t && r && b)
-            mapData[i][j] = MapData.RIVER_TRI_NL;
-        else if (t && r)
-            mapData[i][j] = MapData.RIVER_BEND_TR;
-        else if (t && b)
-            mapData[i][j] = MapData.RIVER_LINE_V;
-        else if (t)
-            mapData[i][j] = MapData.RIVER_END_TOP;
-        else if (r && b)
-            mapData[i][j] = MapData.RIVER_BEND_DR;
-        else if (r)
-            mapData[i][j] = MapData.RIVER_END_RIGHT;
-        else if (b)
-            mapData[i][j] = MapData.RIVER_END_DOWN;
-    }
-
-    private void checkMapRoad(int i, int j) {
-        int road = 0;
-        if (i != 0 && MapFunction.isRoad(mapData[i - 1][j]))
-            road |= 0b0001; //left
-        if (j != 0 && MapFunction.isRoad(mapData[i][j - 1]))
-            road |= 0b0010; // top
-        if (i != mapData.length - 1 && MapFunction.isRoad(mapData[i + 1][j]))
-            road |= 0b0100; // right
-        if (j != mapData[0].length - 1 && MapFunction.isRoad(mapData[i][j + 1]))
-            road |= 0b1000; // bottom
-        switch (road) {
-            case 0b0001:
-                mapData[i][j] = MapData.ROAD_END_LEFT;
-                break;
-            case 0b0010:
-                mapData[i][j] = MapData.ROAD_END_TOP;
-                break;
-            case 0b0100:
-                mapData[i][j] = MapData.ROAD_END_RIGHT;
-                break;
-            case 0b1000:
-                mapData[i][j] = MapData.ROAD_END_DOWN;
-                break;
-            case 0b0011:
-                mapData[i][j] = MapData.ROAD_BEND_TL;
-                break;
-            case 0b0101:
-                mapData[i][j] = MapData.ROAD_LINE_H;
-                break;
-            case 0b1001:
-                mapData[i][j] = MapData.ROAD_BEND_DL;
-                break;
-            case 0b0111:
-                mapData[i][j] = MapData.ROAD_TRI_ND;
-                break;
-            case 0b1011:
-                mapData[i][j] = MapData.ROAD_TRI_NR;
-                break;
-            case 0b1101:
-                mapData[i][j] = MapData.ROAD_TRI_NT;
-                break;
-            case 0b1111:
-                mapData[i][j] = MapData.ROAD_CROSS;
-                break;
-            case 0b0110:
-                mapData[i][j] = MapData.ROAD_BEND_TR;
-                break;
-            case 0b1010:
-                mapData[i][j] = MapData.ROAD_LINE_V;
-                break;
-            case 0b1110:
-                mapData[i][j] = MapData.ROAD_TRI_NL;
-                break;
-            case 0b1100:
-                mapData[i][j] = MapData.ROAD_BEND_DR;
-                break;
-        }
     }
 
     public static GameData getInstance() {
@@ -627,9 +122,14 @@ public class GameData {
             players[i] = new Player();
         }
         
-        serverPlayers = new ServerPlayerStatus[amount];
-        for (int i = 0; i < serverPlayers.length; i++) {
-            serverPlayers[i] = new ServerPlayerStatus();
+        newServerPlayers = new ServerPlayerStatus[amount];
+        for (int i = 0; i < newServerPlayers.length; i++) {
+            newServerPlayers[i] = new ServerPlayerStatus();
+        }
+
+        oldServerPlayers = new ServerPlayerStatus[amount];
+        for (int i = 0; i < oldServerPlayers.length; i++) {
+            oldServerPlayers[i] = new ServerPlayerStatus();
         }
     }
 
@@ -676,6 +176,14 @@ public class GameData {
 
     public void setPlayersSite(int order, float x, float y) {
         getPlayer(order).set(x, y);
+    }
+
+    public void initialPlayerSite(int order, float x, float y) {
+        getPlayer(order).set(x, y);
+        oldServerPlayers[order].x = x;
+        oldServerPlayers[order].y = y;
+        newServerPlayers[order].x = x;
+        newServerPlayers[order].y = y;
     }
 
     public void setPlayersSite(int order, float theta) {
@@ -1084,12 +592,12 @@ public class GameData {
             gunPaint.setColor(Color.rgb(0x20, 0x6b, 0x20));
         }
 
-        public void setSiteByRate(float r , ServerPlayerStatus s){
-            x = (r * x + (100-r) * s.x) / 100;
-            y = (r * y + (100-r) * s.y) / 100;
-            theta = (r * theta + (100-r) * s.theta) / 100;
-            gunTheta = (r * gunTheta + (100-r) * s.gunTheta) / 100;
-            gunLength = (r * gunLength + (100-r) * s.gunLength) / 100;
+        public void setSiteByRate(float r , ServerPlayerStatus o , ServerPlayerStatus n){
+            x = ((100-r) * o.x + r * n.x) / 100;
+            y = ((100-r) * o.y + r * n.y) / 100;
+            theta = ((100-r) * o.theta + r * n.theta) / 100;
+            gunTheta = ((100-r) * o.gunTheta + r * n.gunTheta) / 100;
+            gunLength = ((100-r) * o.gunLength + r * n.gunLength) / 100;
         }
 
         public void beHurt(int damage) {
@@ -1262,5 +770,47 @@ public class GameData {
         public float theta;
         public float gunTheta;
         public float gunLength;
+
+        public void set(Player s){
+            x = s.x;
+            y = s.y;
+            theta = s.theta;
+            gunTheta = s.gunTheta;
+            gunLength = s.gunLength;
+        }
+    }
+
+    private class MyAnimation extends Thread{
+        private float duration = 100;
+        private long beginTime;
+        private float r;
+        private boolean go = true;
+
+        @Override
+        public void run() {
+            r = getRate();
+            while (go && r <= 100 && r >=0) {
+                setSiteByServer(r);
+                r = getRate();
+            }
+        }
+
+        public void halt(){
+            go = false;
+        }
+
+        private float getRate(){
+            long time = System.currentTimeMillis();
+            float delta = (float)(time - beginTime);
+            if (delta > duration)
+                return 101;
+            return delta *100 / duration;
+        }
+
+        @Override
+        public void start() {
+            beginTime = System.currentTimeMillis();
+            super.start();
+        }
     }
 }
