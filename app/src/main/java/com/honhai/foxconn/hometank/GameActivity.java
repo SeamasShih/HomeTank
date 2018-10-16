@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.usage.NetworkStatsManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -107,6 +108,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         right.setDeadMode(true);
         left.setDeadMode(true);
         tcpTankClient.sendMessage(TcpSerCliConstant.C_DEAD + gameData.getMyOrder());
+        send = false;
     }
 
     private void setDeadRightListener() {
@@ -541,7 +543,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private boolean isInternetHasAccess() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo networkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return networkInfo != null && networkInfo.isConnected();
     }
 
@@ -571,6 +573,8 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             gameData.setPlayerAlive(order,false);
         } else if (message.startsWith(TcpSerCliConstant.C_HEART_BEAT)) {
             tcpTankClient.sendMessage(TcpSerCliConstant.C_HEART_BEAT);
+        } else if (message.startsWith(TcpSerCliConstant.C_GAME_OVER)) {
+            Log.d(TAG, "onTcpMessageReceive: C_GAME_OVER");
         }
     }
 
