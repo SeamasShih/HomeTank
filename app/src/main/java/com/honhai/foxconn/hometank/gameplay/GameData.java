@@ -27,34 +27,58 @@ import java.util.Arrays;
 public class GameData {
 
     private final String TAG = "GameData";
-    private static GameData gameData = new GameData();
-    private BoxSet boxSet = new BoxSet();
+    private static GameData gameData;
+    private BoxSet boxSet;
     private MapData[][] mapData;
     private Player[] players;
     private ServerPlayerStatus[] newServerPlayers;
     private ServerPlayerStatus[] oldServerPlayers;
-    private int myOrder = -1;
-    private float interval = 120;
-    private Bullet[] bullets = new Bullet[15];
-    private Boom[] booms = new Boom[15];
-    private BulletPicture bulletPicture = new BulletPicture();
-    private float bulletL = interval * 2 / 5;
-    private int bulletSite = 0;
-    private int boomSite = 0;
+    private int myOrder;
+    private float interval;
+    private Bullet[] bullets;
+    private Boom[] booms;
+    private BulletPicture bulletPicture;
+    private float bulletL;
+    private int bulletSite;
+    private int boomSite;
     private Bitmap bitmap;
-    private int boomL = (int) interval / 4;
-    private Picture map = new Picture();
-    private int mapW = 27;
-    private int mapH = 19;
-    private int roadNum = mapW * mapH / 3;
+    private int boomL;
+    private Picture map;
+    private int mapW;
+    private int mapH;
+    private int roadNum;
     private GameActivity activity;
-    private MyAnimation receiveAnimation = new MyAnimation();
+    private MyAnimation receiveAnimation;
 
     public int getMyType() {
         return getMySelf().type;
     }
 
     private GameData(){
+        initial();
+    }
+
+    private void initial() {
+        gameData = new GameData();
+        boxSet = new BoxSet();
+        myOrder = -1;
+        interval = 120;
+        bullets = new Bullet[15];
+        booms = new Boom[15];
+        bulletPicture = new BulletPicture();
+        bulletL = interval * 2 / 5;
+        bulletSite = 0;
+        boomSite = 0;
+        boomL = (int) interval / 4;
+        map = new Picture();
+        mapW = 27;
+        mapH = 19;
+        roadNum = mapW * mapH / 3;
+        receiveAnimation = new MyAnimation();
+    }
+
+    public void reset(){
+        initial();
     }
 
     public void setPlayerInfoByServer(int order , float x , float y , float theta , float gunTheta , float gunLength){
