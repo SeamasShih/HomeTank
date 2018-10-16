@@ -14,5 +14,6 @@ public class UdpSerCliConstant {
     public final static String C_TANK_DIR = "d";
     public final static String C_TANK_GUN_ROTATION = "r";
     public final static String C_TANK_LENGTH = "l";
+    public final static String C_TANK_INFO_PER_100MS = "p";
     public final static String S_START_GAME = "startgame";
 }

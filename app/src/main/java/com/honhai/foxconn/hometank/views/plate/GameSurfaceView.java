@@ -124,6 +124,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private void drawSomething() {
         try {
             mCanvas = mSurfaceHolder.lockCanvas();
+            if (mCanvas == null) return;
             mCanvas.translate(mWidth/2,mHeight/2);
             mCanvas.drawColor(Color.BLACK);
 
