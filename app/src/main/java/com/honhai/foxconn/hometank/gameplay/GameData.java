@@ -295,6 +295,10 @@ public class GameData {
         getPlayer(order).gunTheta = gunTheta;
     }
 
+    public int getMyLife(){
+        return getMySelf().getLife();
+    }
+
     public float getMyGunTheta() {
         return getMySelf().gunTheta;
     }
@@ -608,6 +612,10 @@ public class GameData {
                 activity.iAmDead();
             }
             activity.setLife(life);
+        }
+
+        public int getLife(){
+            return life;
         }
 
         public float getGunLength() {

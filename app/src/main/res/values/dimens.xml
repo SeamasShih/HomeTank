@@ -6,5 +6,7 @@
     <dimen name="amountHeight">50dp</dimen>
     <dimen name="lifeWidth">150dp</dimen>
     <dimen name="lifeHeight">30dp</dimen>
+    <dimen name="gameOverWidth">200dp</dimen>
+    <dimen name="gameOverHeight">100dp</dimen>
 
 </resources>

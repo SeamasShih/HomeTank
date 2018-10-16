@@ -30,6 +30,7 @@ import com.honhai.foxconn.hometank.network.UdpTankClient;
 import com.honhai.foxconn.hometank.views.keys.FireKey;
 import com.honhai.foxconn.hometank.views.keys.TurnLeftKey;
 import com.honhai.foxconn.hometank.views.keys.TurnRightKey;
+import com.honhai.foxconn.hometank.views.plate.GameOverView;
 import com.honhai.foxconn.hometank.views.plate.GameSurfaceView;
 import com.honhai.foxconn.hometank.views.plate.BulletAmountView;
 import com.honhai.foxconn.hometank.views.plate.LifeBarView;
@@ -46,6 +47,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private BulletAmountView bulletAmountView;
     private FireKey fire;
     private GameSurfaceView surface;
+    private GameOverView gameOverView;
     private boolean goUp = false;
     private boolean goDown = false;
     private boolean goLeft = false;
@@ -93,6 +95,12 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         gameData.setActivity(this);
         sendServer.start();
         wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+        gameOverView.setVisibility(View.GONE);
+        gameOverView.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.setClass(this,WelcomeActivity.class);
+            startActivity(intent);
+        });
     }
 
     public void iAmDead(){
@@ -429,6 +437,19 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
 
     }
 
+    private void gameOver(){
+        gameOverView.setVisibility(View.VISIBLE);
+        if (gameData.getMyLife() > 0){
+            gameOverView.setText("WIN!");
+            gameOverView.setColor(true);
+        }
+        else {
+            gameOverView.setText("DEFEAT!");
+            gameOverView.setColor(false);
+        }
+        gameOverView.invalidate();
+    }
+
     private void setRightListener() {
         right.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
@@ -538,6 +559,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         bulletAmountView = findViewById(R.id.bulletAmount);
         lifeBarView = findViewById(R.id.lifeBar);
         surface = findViewById(R.id.surface);
+        gameOverView = findViewById(R.id.gameOverView);
     }
 
     private boolean isInternetHasAccess() {
@@ -574,7 +596,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         } else if (message.startsWith(TcpSerCliConstant.C_HEART_BEAT)) {
             tcpTankClient.sendMessage(TcpSerCliConstant.C_HEART_BEAT);
         } else if (message.startsWith(TcpSerCliConstant.C_GAME_OVER)) {
-            Log.d(TAG, "onTcpMessageReceive: C_GAME_OVER");
+            runOnUiThread(this::gameOver);
         }
     }
 

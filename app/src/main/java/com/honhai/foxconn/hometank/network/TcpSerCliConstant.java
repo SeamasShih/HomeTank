@@ -12,5 +12,5 @@ public class TcpSerCliConstant {
     public static final String C_PLAYER_SITE = "s";
     public final static String C_DEAD = "d";
     public final static String C_HEART_BEAT = "h";
-    public final static String C_GAME_OVER = "o";
+    public final static String C_GAME_OVER = "go";
 }

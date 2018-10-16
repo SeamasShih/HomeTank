@@ -27,6 +27,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <com.honhai.foxconn.hometank.views.plate.GameOverView
+        android:id="@+id/gameOverView"
+        android:layout_width="@dimen/gameOverWidth"
+        android:layout_height="@dimen/gameOverHeight"
+        android:background="@color/gameOverBackground"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <include layout="@layout/game_base_button_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
