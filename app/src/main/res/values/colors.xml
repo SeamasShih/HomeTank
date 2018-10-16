@@ -8,4 +8,5 @@
     <color name="pillar">#8b392a</color>
     <color name="pillarLine">#31312e</color>
     <color name="road">#4b4b4b</color>
+    <color name="gameOverBackground">#808080</color>
 </resources>
