@@ -6,9 +6,10 @@ public class TcpSerCliConstant {
     final static int PORT = 9488;
 
 
-    public final static String C_END = "end";
+    public final static String C_END = "e";
     public final static String C_MAP = "m";
     public final static String C_FIRE = "f";
     public static final String C_PLAYER_SITE = "s";
     public final static String C_DEAD = "d";
+    public final static String C_HEART_BEAT = "h";
 }

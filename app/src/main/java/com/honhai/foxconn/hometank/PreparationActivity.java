@@ -152,6 +152,8 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
                     tempSiteList.add(new int[]{order, x, y});
                 }
             }
+        } else if (message.startsWith(TcpSerCliConstant.C_HEART_BEAT)) {
+            tcpTankClient.sendMessage(TcpSerCliConstant.C_HEART_BEAT);
         }
     }
 }

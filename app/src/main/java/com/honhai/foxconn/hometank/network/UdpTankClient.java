@@ -61,6 +61,7 @@ public class UdpTankClient {
     }
 
     public void sendMessage(String message) {
+        Log.d(TAG, "sendMessage: UDP");
         new Thread(() -> {
             try {
                 byte[] sendBuffer = message.toLowerCase().getBytes();

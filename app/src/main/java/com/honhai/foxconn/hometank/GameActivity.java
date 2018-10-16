@@ -3,13 +3,20 @@ package com.honhai.foxconn.hometank;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.app.usage.NetworkStatsManager;
+import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
+import android.widget.Toast;
 
 import com.honhai.foxconn.hometank.gameplay.GameData;
 import com.honhai.foxconn.hometank.network.TcpReceiveListener;
@@ -50,6 +57,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
     private ValueAnimator bulletAdd;
     private UdpTankClient udpTankClient = UdpTankClient.getClient(this);
     private TcpTankClient tcpTankClient = TcpTankClient.getClient(this);
+    private WifiManager wifiManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +71,8 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         setAnimation();
         setClientInfo();
         gameData.setActivity(this);
+
+        wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
     }
 
     public void iAmDead(){
@@ -305,7 +315,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
 
     private void setFireListener() {
         fire.setOnClickListener(v -> {
-            if (bulletAmount > 0 && !bulletCD.isRunning()) {
+            if (bulletAmount > 0 && !bulletCD.isRunning() && wifiManager.isWifiEnabled() && isInternetHasAccess()) {
                 gameData.addBullet(gameData.getMySelf());
                 tcpTankClient.sendMessage(TcpSerCliConstant.C_FIRE + gameData.getMyOrder() + gameData.getBulletInfo(gameData.getMyType()));
                 bulletAmount--;
@@ -537,6 +547,13 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         surface = findViewById(R.id.surface);
     }
 
+    private boolean isInternetHasAccess() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
     @Override
     public void onTcpMessageReceive(String message) {
         if (message.startsWith(TcpSerCliConstant.C_FIRE)) {
@@ -561,6 +578,8 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         } else if (message.startsWith(TcpSerCliConstant.C_DEAD)){
             int order = Character.getNumericValue(message.charAt(TcpSerCliConstant.C_DEAD.length()));
             gameData.setPlayerAlive(order,false);
+        } else if (message.startsWith(TcpSerCliConstant.C_HEART_BEAT)) {
+            tcpTankClient.sendMessage(TcpSerCliConstant.C_HEART_BEAT);
         }
     }
 

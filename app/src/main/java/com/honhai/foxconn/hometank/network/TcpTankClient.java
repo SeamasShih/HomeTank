@@ -16,8 +16,13 @@ public class TcpTankClient {
     private Socket socket;
     private DataInputStream dataInputStream;
     private volatile DataOutputStream dataOutputStream;
+    private String ip;
+    private int port;
 
     private TcpTankClient(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
+
         new Thread(() -> {
             try {
                 socket = new Socket(ip, port);
@@ -43,6 +48,16 @@ public class TcpTankClient {
         new Thread(() -> {
             try {
                 while (dataOutputStream == null);
+                if (socket.isClosed()) {
+                    socket = null;
+                    dataInputStream = null;
+                    dataOutputStream = null;
+
+                    socket = new Socket(ip, port);
+                    dataInputStream = new DataInputStream(socket.getInputStream());
+                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    startReceiveMessage();
+                }
                 dataOutputStream.writeUTF(message);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -53,7 +68,7 @@ public class TcpTankClient {
     private void startReceiveMessage() {
         new Thread(() -> {
             String msg = "";
-            while (!msg.equals(TcpSerCliConstant.C_END)) {
+            while (!msg.startsWith(TcpSerCliConstant.C_END)) {
                 try {
                     msg = dataInputStream.readUTF();
                     tcpReceiveListener.onTcpMessageReceive(msg);
