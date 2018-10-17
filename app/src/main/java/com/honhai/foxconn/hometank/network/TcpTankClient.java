@@ -44,6 +44,10 @@ public class TcpTankClient {
         return tcpTankClient;
     }
 
+    public static void resetClient() {
+        tcpTankClient = null;
+    }
+
     public void sendMessage(String message) {
         new Thread(() -> {
             try {
@@ -81,7 +85,7 @@ public class TcpTankClient {
         }).start();
     }
 
-    private void stopClient() {
+    public void stopClient() {
         try {
             dataInputStream.close();
             dataOutputStream.close();

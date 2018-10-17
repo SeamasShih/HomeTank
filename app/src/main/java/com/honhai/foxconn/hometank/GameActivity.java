@@ -7,6 +7,7 @@ import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.hardware.usb.UsbConstants;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -97,6 +98,8 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
         wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
         gameOverView.setVisibility(View.GONE);
         gameOverView.setOnClickListener(v -> {
+            surface.setIsDrawing(false);
+            send = false;
             Intent intent = new Intent();
             intent.setClass(this,WelcomeActivity.class);
             startActivity(intent);
@@ -439,7 +442,7 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
 
     private void gameOver(){
         gameOverView.setVisibility(View.VISIBLE);
-        if (gameData.getMyLife() > 0){
+        if (gameData.amIAlive()){
             gameOverView.setText("WIN!");
             gameOverView.setColor(true);
         }
@@ -597,6 +600,9 @@ public class GameActivity extends AppCompatActivity implements UdpReceiveListene
             tcpTankClient.sendMessage(TcpSerCliConstant.C_HEART_BEAT);
         } else if (message.startsWith(TcpSerCliConstant.C_GAME_OVER)) {
             runOnUiThread(this::gameOver);
+            tcpTankClient.stopClient();
+            udpTankClient.sendMessage(UdpSerCliConstant.C_GAME_OVER);
+            TcpTankClient.resetClient();
         }
     }
 

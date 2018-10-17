@@ -43,6 +43,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         fog.setFillType(Path.FillType.INVERSE_WINDING);
     }
 
+    public void setIsDrawing(boolean isDrawing) {
+        this.mIsDrawing = isDrawing;
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mIsDrawing = true;

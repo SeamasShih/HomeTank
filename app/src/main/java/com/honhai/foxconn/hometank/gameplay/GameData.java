@@ -27,7 +27,7 @@ import java.util.Arrays;
 public class GameData {
 
     private final String TAG = "GameData";
-    private static GameData gameData;
+    private static GameData gameData = new GameData();
     private BoxSet boxSet;
     private MapData[][] mapData;
     private Player[] players;
@@ -59,7 +59,6 @@ public class GameData {
     }
 
     private void initial() {
-        gameData = new GameData();
         boxSet = new BoxSet();
         myOrder = -1;
         interval = 120;
@@ -79,6 +78,7 @@ public class GameData {
 
     public void reset(){
         initial();
+        players = null;
     }
 
     public void setPlayerInfoByServer(int order , float x , float y , float theta , float gunTheta , float gunLength){
