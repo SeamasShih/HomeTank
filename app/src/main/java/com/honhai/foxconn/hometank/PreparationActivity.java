@@ -106,9 +106,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
             gameData.createPlayers(
                     Character.getNumericValue(message.charAt(UdpSerCliConstant.S_START_GAME.length())));
 
-            while (tempSiteList.size() == 0) {
-                if (tempSiteList.size() == gameData.getPlayerAmount()) break;
-            }
+            while (tempSiteList.size() != gameData.getPlayerAmount());
             tempSiteList.forEach(ints -> gameData.initialPlayerSite(ints[0], ints[1], ints[2]));
             tempSiteList.clear();
 
