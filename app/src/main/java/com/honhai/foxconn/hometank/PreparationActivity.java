@@ -31,7 +31,7 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
     private GameData gameData = GameData.getInstance();
     private UdpTankClient udpTankClient = UdpTankClient.getClient(this);
     private TcpTankClient tcpTankClient = TcpTankClient.getClient(this);
-    private List<int[]> tempSiteList = new ArrayList<>();
+    private volatile List<int[]> tempSiteList = new ArrayList<>();
     private int tankType;
 
     @Override
@@ -105,8 +105,13 @@ public class PreparationActivity extends AppCompatActivity implements UdpReceive
         } else if (message.startsWith(UdpSerCliConstant.S_START_GAME)) {
             gameData.createPlayers(
                     Character.getNumericValue(message.charAt(UdpSerCliConstant.S_START_GAME.length())));
+
+            while (tempSiteList.size() == 0) {
+                if (tempSiteList.size() == gameData.getPlayerAmount()) break;
+            }
             tempSiteList.forEach(ints -> gameData.initialPlayerSite(ints[0], ints[1], ints[2]));
             tempSiteList.clear();
+
             Intent intent = new Intent();
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.setClass(this, GameActivity.class);
